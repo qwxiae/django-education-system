@@ -24,6 +24,6 @@ class Command(BaseCommand):
             if created:
                 self.stdout.write(f"Created category: {name}")
             else:
-                self.stdout.write(f"Category already exists")
+                self.stdout.write(f"Category '{name}' already exists")
 
         self.stdout.write(self.style.SUCCESS("Done creating categories."))
