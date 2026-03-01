@@ -1,5 +1,10 @@
 # Byte-compiled / optimized / DLL files
-htmlcov
+# infra secrets
+infra/nginx/ssl/
+infra/nginx/*.crt
+infra/nginx/*.key
+
+htmlcov/
 media/
 checklists/
 __pycache__/
