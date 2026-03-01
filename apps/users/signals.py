@@ -2,19 +2,17 @@
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
-from .models import Profile #, NotificationPreference
+from .models import Profile, Role, UserRole
 
 User = get_user_model()
 
-@receiver(post_delete, sender=Profile, dispatch_uid="Delete profile picture")
+@receiver(post_delete, sender=Profile, dispatch_uid="delete_profile_avatar")
 def delete_profile_avatar(sender, instance, **kwargs):
     """ Delete avatar from file system if avatar exists """
-    import os
     if instance.avatar:
-        if os.path.isfile(instance.avatar.path):
-            os.remove(instance.avatar.path)
+        instance.avatar.delete(save=False)
             
-@receiver(post_save, sender=User, dispatch_uid="Create users profile")
+@receiver(post_save, sender=User, dispatch_uid="create_user_profile")
 def create_user_profile(sender, instance, created, **kwargs):
     """ Create profile for user """
     '''
@@ -27,3 +25,9 @@ def create_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
         # NotificationPreference.objects.create(user=instance)
+
+        try:
+            student_role = Role.objects.get(name="student")
+            UserRole.objects.create(user=instance, role=student_role)
+        except Exception as e:
+            print(f"Signal error: {e}")
