@@ -22,16 +22,20 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractUser):
-    # Remove username - logging is done via email
-    username = None
     # Remove names - they live on Profile
     first_name = None
     last_name = None
 
+    username = models.CharField(
+        max_length=50,
+        unique=True,
+        null=False,
+        blank=True
+    )
     email = models.EmailField(unique=True)
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ["username"]
 
     objects = UserManager()
 
@@ -50,7 +54,7 @@ class User(AbstractUser):
     
     @property
     def is_moderator(self) -> bool:
-        return self.has_role("moderator")
+        return self.has_role("moderator")                
 
     class Meta:
         db_table = "users_user"
@@ -75,13 +79,6 @@ class Profile(models.Model):
         max_length=150,
         blank=True,
         default=""
-    )
-    username = models.CharField(
-        max_length=50, 
-        unique=True,
-        null=True,
-        blank=True,
-        default=None
     )
     avatar = models.ImageField(
         upload_to="avatars/",

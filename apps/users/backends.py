@@ -6,6 +6,10 @@ User = get_user_model()
 class EmailBackend(ModelBackend):
     """We owerite the default username authentication"""
     def authenticate(self, request, email=None, password=None, **kwargs):
+        """
+        # Django admin login form sends credentials as username=
+        # your login form sends them as email=
+        """
         if email is None:
             email = kwargs.get("username")
 

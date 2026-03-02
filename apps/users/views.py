@@ -54,15 +54,14 @@ def login_view(request: HttpRequest) -> HttpResponse:
     )
 
 
-def public_profile_view(request: HttpRequest, user_id: int) -> HttpResponse:
-    user = get_object_or_404(User, pk=user_id)
+def public_profile_view(request: HttpRequest, username: str) -> HttpResponse:
+    user = get_object_or_404(User, username=username)
     profile = user.profile
     data = {
-        "id": profile.user.id,
+        "username": user.username,
         "email": profile.user.email,
         "first_name": profile.first_name,
         "last_name": profile.last_name,
-        "username": profile.username,
         "bio": profile.bio,
         "phone": profile.phone,
         "avatar": profile.avatar.url if profile.avatar else None,
@@ -85,11 +84,10 @@ def profile_view(request: HttpRequest):
     profile = request.user.profile
     
     data = {
-        "id": profile.user.id,
+        "username": request.user.username,
         "email": profile.user.email,
         "first_name": profile.first_name,
         "last_name": profile.last_name,
-        "username": profile.username,
         "bio": profile.bio,
         "phone": profile.phone,
         "avatar": profile.avatar.url if profile.avatar else None,
@@ -118,7 +116,3 @@ def profile_edit_view(request: HttpRequest) -> HttpResponse:
         form = ProfileForm(instance=request.user.profile)
 
     return render(request, "users/profile_edit.html", {"form": form})
-
-# TODO: once you do enrollements make sure to show them here
-def my_courses_view(request: HttpRequest):
-    pass

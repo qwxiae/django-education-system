@@ -2,21 +2,13 @@ from django.test import TestCase, Client
 from .models import User, Profile, Role, UserRole
 from django.urls import reverse
 
-'''
-    >>> c = Client()
-    >>> response = c.post("/login/", {"username": "john", "password": "smith"})
-    >>> response.status_code
-    200
-    >>> response = c.get("/customer/details/")
-    >>> response.content
-    b'<!DOCTYPE html...'
-'''
 
 class UserTestCase(TestCase):
     def setUp(self):
         self.client = Client()
         Role.objects.create(name="student")
         self.user = User.objects.create_user(
+            username="test_user",
             email="test@test.com",
             password="Xk9#mP2$qL5nR8@w123",
         )
@@ -90,6 +82,7 @@ class ProfileTestCase(TestCase):
         self.client = Client()
         Role.objects.create(name="student")
         self.user = User.objects.create_user(
+            username="test_user",
             email="test@test.com",
             password="Xk9#mP2$qL5nR8@w123"
         )
@@ -97,6 +90,7 @@ class ProfileTestCase(TestCase):
 
     def test_get_profile_page(self):
         other_user = User.objects.create_user(
+            username="other_test_user",
             email="other_test@test.com",
             password="Xk9#mP2$qL5nR8@w321",
         )
@@ -138,6 +132,7 @@ class UserRoleTestCase(TestCase):
     def setUp(self):
         self.role = Role.objects.create(name="student")
         self.user = User.objects.create_user(
+            username="test_user",
             email="test@test.com",
             password="Xk9#mP2$qL5nR8@w123"
         )

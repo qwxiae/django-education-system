@@ -11,15 +11,16 @@ class Command(BaseCommand):
 
         instructor_role = Role.objects.get(name="instructor")
         user_data = [
-            ("test@test.com", "hr2htBeTryYQ", True),
-            ("janedoe@test.com", "43uqjK3vTyAq", True),
-            ("johndoe@test.com", "HAz6ghNn97u4", False),
-            ("annabelle@test.com", "PXQENDSEDTkr", False),
-            ("nadinerami@test.com", "NWyhpcVtF6rp", False)
+            ("test_user", "test@test.com", "hr2htBeTryYQ", True),
+            ("jane_doe", "janedoe@test.com", "madotsuki", True),
+            ("john_d0e", "johndoe@test.com", "urotsuki", False),
+            ("annabe113", "annabelle@test.com", "PXQENDSEDTkr", False),
+            ("nadine_rami", "nadinerami@test.com", "NWyhpcVtF6rp", False)
         ]
 
-        for email, password, is_instructor in user_data:
+        for username, email, password, is_instructor in user_data:
             user, create = User.objects.get_or_create(
+                username=username,
                 email=email,
                 defaults={"password": password}
             )

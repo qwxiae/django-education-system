@@ -5,12 +5,11 @@ from django.contrib.auth.forms import UserCreationForm
 class RegisterForm(UserCreationForm):
     """ 
     UserCreationForm handles password1, password2, hashing. 
-    Tell the form to use email instead of username
+    Tell the form to use email instead of username for auth
     """
     class Meta:
         model = User
-        fields = ["email", "password1", "password2"]
-
+        fields = ["username", "email", "password1", "password2"]
 
 class LoginForm(forms.Form):
     """
@@ -20,10 +19,17 @@ class LoginForm(forms.Form):
     email = forms.EmailField()
     password = forms.CharField(widget=forms.PasswordInput)
 
+
+# == Update FORMS ==
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ["username", "first_name", "last_name" , "avatar", "phone", "bio"]
+        fields = ["first_name", "last_name" , "avatar", "phone", "bio"]
+
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["username"]
 
 # TODO: Email forms
 # class EmailChangeForm

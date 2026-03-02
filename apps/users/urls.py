@@ -13,15 +13,12 @@ urlpatterns = [
 
 
     # Public Profiles
-    path("users/<int:user_id>/", views.public_profile_view, name="public_profile"),
+    path("users/<str:username>/", views.public_profile_view, name="public_profile"),
 
     # Own Profile
     path("me/", views.profile_view, name="profile"),
     path("me/edit/", views.profile_edit_view, name="profile_edit"),
     
-    # My Courses
-    path("me/learn/", views.my_courses_view, name="my_courses"),
-
     # Password Reset
     # path("auth/password-reset/", views.password_reset_view, name="password_reset"),
     # path("auth/password-reset/confirm/", views.password_reset_confirm_view, name="password_reset_confirm"),

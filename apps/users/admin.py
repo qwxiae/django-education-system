@@ -15,7 +15,7 @@ class RoleAdmin(admin.ModelAdmin):
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     ordering = ["email"]
-    list_display = ["email", "is_staff", "is_active", "date_joined"]
+    list_display = ["username", "email", "is_staff", "is_active", "date_joined"]
 
     fieldsets = (
         (None, {"fields": ("email", "password")}),
@@ -36,15 +36,15 @@ class UserAdmin(BaseUserAdmin):
         }),
     )
 
-    search_fields = ["email"]
+    search_fields = ["username", "email"]
     readonly_fields = ["last_login", "date_joined"]
     inlines = [UserRoleInline]
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ["user", "username", "first_name", "last_name", "avatar", "phone", "bio"]
+    list_display = ["user", "first_name", "last_name", "avatar", "phone", "bio"]
     fieldsets = (
-        (None, {"fields": ("user", "username", "avatar", "bio")}),
+        (None, {"fields": ("user", "avatar", "bio")}),
         ("Personal Information", {"fields": ("first_name", "last_name", "phone")})
     )
     search_fields = ["user", "user__email"]
