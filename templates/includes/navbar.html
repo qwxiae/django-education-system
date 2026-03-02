@@ -1,0 +1,35 @@
+<nav class="nav">
+    <a href="{% url 'courses:home' %}" class="nav-logo">
+        <span class="nav-logo-dot"></span>
+        EduPlatform
+    </a>
+
+    <ul class="nav-links">
+        <li><a href="{% url 'courses:catalog' %}">Catalog</a></li>
+        <li><a href="{% url 'courses:about' %}">About</a></li>
+
+        {% if user.is_authenticated %}
+            {% comment %} <li><a href="{% url 'users:my_courses' %}" class="hide-mobile">My Courses</a></li> {% endcomment %}
+            <li><a href="#" class="hide-mobile">My Courses</a></li>
+            <li><span class="nav-divider"></span></li>
+            <li><a href="{% url 'users:profile' %}">{{ user.email }}</a></li>
+            <li>
+                <a href="{% url 'users:logout' %}" class="btn btn-ghost">
+                    Logout
+                </a>
+            </li>
+        {% else %}
+            <li><span class="nav-divider"></span></li>
+            <li>
+                <a href="{% url 'users:login' %}" class="btn btn-ghost">
+                    Login
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'users:register' %}" class="btn btn-primary">
+                    Register
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>

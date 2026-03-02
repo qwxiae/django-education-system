@@ -1,12 +1,11 @@
-<!-- templates/users/register.html -->
-<!DOCTYPE html>
-<html>
-<body>
-  <!-- If you dont add enctype image will not be saved -->
+{% extends "base.html" %}
+{% block content %}
+<div class="form-card" style="max-width: 1000px;">
+<h1>Edit Profile</h1>
 <form method="POST" enctype="multipart/form-data">
   {% csrf_token %}
   {{ form.as_p }}
-  <button type="submit">Edit</button>
+  <button class="btn btn-primary" type="submit" class>Edit</button>
 </form>
-</body>
-</html>
+</div>
+{% endblock %}
