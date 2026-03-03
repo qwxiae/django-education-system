@@ -10,11 +10,7 @@ urlpatterns = [
     # === Catalog ===
     # search and list all courses
     path("catalog/", views.catalog_view, name="catalog"),
-    # list all categories
-    path("catalog/categories/", views.categories_view, name="categories"),
-    path("catalog/categories/<slug:slug>/", views.category_view, name="category_courses"),
-
-
+    
     # === Courses ====
     path("courses/<slug:slug>/", views.course_detail_view, name="course_detail"),
     
@@ -24,4 +20,15 @@ urlpatterns = [
     # show authenticated users enrolled courses
     path("learn/", views.my_courses_view, name="my_courses"),
 
+    # === Lessons ===
+    # path(
+    #   "courses/<slug:slug>/modules/<module_id:str>/lessons/",
+    #   views.module_lessons_view,
+    #   name="module_lessons"
+    # )
+    # path(
+    #   "courses/<slug:slug>/modules/<module_id:str>/lessons/<lesson_id:str>/",
+    #   views.lesson_detail_view,
+    #   name="lesson"
+    # )
 ]
