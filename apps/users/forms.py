@@ -10,18 +10,35 @@ class RegisterForm(UserCreationForm):
     class Meta:
         model = User
         fields = ["username", "email", "password1", "password2"]
+        widgets = {
+            "email": forms.EmailInput(attrs={"placeholder": "you@example.com"}),
+            "username": forms.TextInput(attrs={"placeholder": "johndoe"})
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # cant go into widgets as they are defined on UserCreationForm itself
+        self.fields["password1"].widget.attrs["placeholder"] = "••••••••"
+        self.fields["password2"].widget.attrs["placeholder"] = "••••••••"
 
 class LoginForm(forms.Form):
     """
     Not a ModelForm - you are not creating/editing a model 
     but collecting credentials
     """
-    email = forms.EmailField()
-    password = forms.CharField(widget=forms.PasswordInput)
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={"placeholder": "you@example.com"})
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={"placeholder": "••••••••"})
+    )
 
-
-# == Update FORMS ==
 class ProfileForm(forms.ModelForm):
+    # gets rid of checkbox; custom image upload in templates
+    avatar = forms.ImageField(
+        required=False,
+        widget=forms.FileInput()
+    )
     class Meta:
         model = Profile
         fields = ["first_name", "last_name" , "avatar", "phone", "bio"]
@@ -30,7 +47,3 @@ class UserForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ["username"]
-
-# TODO: Email forms
-# class EmailChangeForm
-# class PasswordChangeForm
