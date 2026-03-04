@@ -1,5 +1,7 @@
 from pathlib import Path
 from decouple import config
+import sys
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -21,6 +23,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
     "apps.users",
     "apps.courses",
     # "apps.lessons",
@@ -114,3 +117,18 @@ AUTHENTICATION_BACKENDS = ["apps.users.backends.EmailBackend"]
 
 EMAIL_HOST = config('EMAIL_HOST', default='localhost')
 LOGIN_URL = "login"
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
+TESTING = "test" in sys.argv or "PYTEST_VERSION" in os.environ
+
+if not TESTING:
+    INSTALLED_APPS = [
+        *INSTALLED_APPS,
+        "debug_toolbar",
+    ]
+    MIDDLEWARE = [
+        "debug_toolbar.middleware.DebugToolbarMiddleware",
+        *MIDDLEWARE,
+    ]

@@ -9,3 +9,10 @@ urlpatterns = [
     path('', include('apps.courses.urls')),
     # path('', include('apps.lessons.urls'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if not settings.TESTING:
+    from debug_toolbar.toolbar import debug_toolbar_urls
+
+    urlpatterns = [
+        *urlpatterns,
+    ] + debug_toolbar_urls()
