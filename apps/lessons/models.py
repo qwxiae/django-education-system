@@ -34,8 +34,8 @@ class Lesson(models.Model):
                     break
         super().save(*args, **kwargs)
 
-    # def get_absolute_url(self):
-    #     return reverse("lessons:lesson", kwargs={"public_id": self.public_id})
+    def get_absolute_url(self):
+        return reverse("lessons:lesson", kwargs={"public_id": self.public_id})
     
     def __str__(self):
         return f"Lesson(Module{self.module.title}, {self.title})"
@@ -71,12 +71,23 @@ class Step(models.Model):
 
 class TheoryStep(Step):
     html_content = models.TextField()
+
+    def save(self, *args, **kwargs):
+        self.type = Step.StepType.THEORY
+        super().save(*args, **kwargs)
+
     class Meta:
         db_table = "lessons_theorystep"
 
 class ChoiceStep(Step):
     question_text = models.TextField()
     is_multiple = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        self.type = Step.StepType.CHOICE
+        super().save(*args, **kwargs)
+    
+
     class Meta:
         db_table = "lessons_choicestep"
 
@@ -96,6 +107,7 @@ class ChoiceOption(models.Model):
         unique_together = [
             ('step', 'order'),
         ]
+        ordering = ["order"]
 
 class TextInputStep(Step):
     question_text = models.TextField()
@@ -103,6 +115,11 @@ class TextInputStep(Step):
         max_length=255,
         blank=False,
     )
+
+    def save(self, *args, **kwargs):
+        self.type = Step.StepType.TEXT_INPUT
+        super().save(*args, **kwargs)
+    
     class Meta:
         db_table = "lessons_textinputstep"
 
@@ -120,6 +137,10 @@ class ProgrammingStep(Step):
     memory_limit_mb = models.PositiveIntegerField(default=50)
     solution_template = models.TextField(blank=True, default="")
     
+    def save(self, *args, **kwargs):
+        self.type = Step.StepType.CODE
+        super().save(*args, **kwargs)
+
     class Meta:
         db_table = "lessons_programmingstep"
 
