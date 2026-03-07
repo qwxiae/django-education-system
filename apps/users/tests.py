@@ -148,7 +148,6 @@ class UserRoleTestCase(TestCase):
     def test_delete_user_from_userrole(self):
         user_id = self.user.id
         self.user.delete()
-        # TODO: where did user_id come from?
         self.assertFalse(UserRole.objects.filter(user_id=user_id).exists())
 
     def test_update_userrole(self):
