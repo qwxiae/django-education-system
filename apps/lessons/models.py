@@ -29,8 +29,15 @@ class Lesson(models.Model):
         return reverse("lessons:lesson", kwargs={"public_id": self.public_id})
 
     def __str__(self):
-        return f"Lesson(Module{self.module.title}, {self.title})"
+        return f"Lesson(module={self.module.title}, title={self.title})"
 
+    def save(self, *args, **kwargs):
+        if not self.pk and not self.order:
+            last = Lesson.objects.filter(module=self.module).aggregate(
+                max_order=models.Max("order")
+            )["max_order"] or 0
+            self.order = last + 1
+        super().save(*args, **kwargs)
 
 class Step(models.Model):
     class StepType(models.TextChoices):
@@ -52,7 +59,7 @@ class Step(models.Model):
         ordering = ["order"]
 
     def __str__(self):
-        return f"Step(Lesson({self.lesson_id}), {self.order})"
+        return f"Step(lesson={self.lesson_id}, order={self.order}, type={self.type})"
 
 
 class TheoryStep(Step):

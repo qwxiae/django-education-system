@@ -29,7 +29,7 @@ class Category(models.Model):
         verbose_name_plural = "categories"
 
     def __str__(self):
-        return f"Category({self.name})"
+        return f"Category(name={self.name})"
 
 
 class Course(models.Model):
@@ -77,7 +77,7 @@ class Course(models.Model):
         db_table = "courses_course"
 
     def __str__(self):
-        return f"Course({self.title})"
+        return f"Course(title={self.title})"
 
 
 class Module(models.Model):
@@ -98,9 +98,17 @@ class Module(models.Model):
         ordering = ["order"]
 
     def __str__(self):
-        return f"Module(Course({self.course.title}), {self.title})"
+        return f"Module(course={self.course.title}), title={self.title})"
 
-
+    def save(self, *args, **kwargs):
+        # only on creation
+        if not self.pk and not self.order:
+            last = Module.objects.filter(course=self.course).aggregate(
+                max_order=models.Max("order")
+            )["max_order"] or 0
+            self.order = last + 1
+        super().save(*args, **kwargs)
+        
 class Enrollment(models.Model):
     """Connect user to course"""
 
@@ -131,4 +139,4 @@ class Enrollment(models.Model):
         unique_together = [("user", "course")]
 
     def __str__(self):
-        return f"Enrollment(User({self.user.email}), Course({self.course.title}))"
+        return f"Enrollment(user={self.user.email}, course={self.course.title})"
