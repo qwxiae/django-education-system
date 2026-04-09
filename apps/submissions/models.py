@@ -36,7 +36,10 @@ class ChoiceSubmission(models.Model):
     submission = models.OneToOneField(
         Submission, on_delete=models.CASCADE, related_name="choice_submission"
     )
-    selected_option_ids = models.JSONField()
+    selected_options = models.ManyToManyField(
+        "lessons.ChoiceOption",
+        related_name="submissions"
+    )
     is_correct = models.BooleanField(default=False)
 
     class Meta:
