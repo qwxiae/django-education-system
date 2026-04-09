@@ -11,6 +11,7 @@ urlpatterns = [
     path("", include("apps.users.urls")),
     path("", include("apps.courses.urls")),
     path("", include("apps.lessons.urls")),
+    path("", include("apps.submissions.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if not settings.TESTING and settings.DEBUG:

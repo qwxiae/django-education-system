@@ -8,7 +8,7 @@
 {% elif current_step.type == "C" %}
 <div class="question-card">
     <p class="question-text">{{ current_step.question_text }}</p>
-    <form hx-post="{% url 'lessons:submit' lesson.public_id %}"
+    <form hx-post="{% url 'submission:submit' lesson.public_id %}"
           hx-target="#step-content"
           hx-swap="innerHTML">
         {% csrf_token %}
@@ -31,7 +31,7 @@
 {% elif current_step.type == "I" %}
 <div class="question-card">
     <p class="question-text">{{ current_step.question_text }}</p>
-    <form hx-post="{% url 'lessons:submit' lesson.public_id %}"
+    <form hx-post="{% url 'submission:submit' lesson.public_id %}"
           hx-target="#step-content"
           hx-swap="innerHTML">
         {% csrf_token %}
@@ -47,7 +47,7 @@
 {% elif current_step.type == "P" %}
 <div class="question-card">
     <p class="question-text">{{ current_step.question_text }}</p>
-    <form hx-post="{% url 'lessons:submit' lesson.public_id %}"
+    <form hx-post="{% url 'submission:submit' lesson.public_id %}"
           hx-target="#step-content"
           hx-swap="innerHTML">
         {% csrf_token %}

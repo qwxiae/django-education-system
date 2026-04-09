@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     "apps.users",
     "apps.courses",
     "apps.lessons",
-    # "apps.submissions",
+    "apps.submissions",
     # "apps.analytics",
     # "apps.notifications",
 ]
@@ -53,7 +53,11 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+# settings.py
+if ENVIRONMENT == "production":
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+else:
+    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 
 ROOT_URLCONF = "config.urls"
 
