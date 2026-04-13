@@ -8,14 +8,12 @@
 <!-- HERO -->
 <section class="hero">
     <div class="hero-content">
-        <div class="hero-label">Welcome to EduPlatform</div>
         <h1 class="hero-title">
             Knowledge is<br>
             <span class="hero-accent">always within reach.</span>
         </h1>
         <p class="hero-sub">
-            Explore hundreds of courses across programming, mathematics,
-            cybersecurity and more. Start learning for free today.
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla sit amet interdum nisi. Vestibulum vel sem mattis, vulputate lectus sed, aliquam neque. Ut quis dapibus erat.
         </p>
         <div class="hero-actions">
             {% if user.is_authenticated %}
@@ -94,8 +92,8 @@
     <div class="cta-banner-content">
         <h2>Ready to start learning?</h2>
         <p>Join thousands of learners and get access to all courses for free.</p>
+        <a href="{% url 'users:register' %}">Create Free Account</a>
     </div>
-    <a href="{% url 'users:register' %}" class="btn btn-primary">Create Free Account</a>
 </section>
 {% endif %}
 

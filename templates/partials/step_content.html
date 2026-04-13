@@ -1,14 +1,16 @@
 {% load static %}
-<!-- swapped into #step-content -->
+
 {% if current_step.type == "T" %}
+<!-- === THEORY === -->
 <div class="theory-content">
     {{ current_step.html_content|safe }}
 </div>
 
 {% elif current_step.type == "C" %}
+<!-- === CHOICE === -->
 <div class="question-card">
-    <p class="question-text">{{ current_step.question_text }}</p>
-    <form hx-post="{% url 'submission:submit' lesson.public_id %}"
+    <div class="question-text">{{ current_step.question_text|safe }}</div>
+    <form hx-post="{% url 'submissions:submit' lesson.public_id %}"
           hx-target="#step-content"
           hx-swap="innerHTML">
         {% csrf_token %}
@@ -24,30 +26,39 @@
                 </label>
             {% endfor %}
         </div>
-        <button class="btn btn-primary" type="submit">Submit answer</button>
+        <div class="question-actions">
+            <button class="btn btn-primary" type="submit">Submit answer</button>
+        </div>
     </form>
 </div>
 
 {% elif current_step.type == "I" %}
+<!-- === TEXT INPUT === -->
 <div class="question-card">
-    <p class="question-text">{{ current_step.question_text }}</p>
-    <form hx-post="{% url 'submission:submit' lesson.public_id %}"
+    <div class="question-text">{{ current_step.question_text|safe }}</div>
+    <form hx-post="{% url 'submissions:submit' lesson.public_id %}"
           hx-target="#step-content"
           hx-swap="innerHTML">
         {% csrf_token %}
         <input type="hidden" name="step_id" value="{{ current_step.pk }}">
         <input type="hidden" name="step_order" value="{{ current_step.order }}">
         <div class="form-group">
-            <input type="text" name="answer" placeholder="Type your answer..." autocomplete="off">
+            <input type="text"
+                   name="answer"
+                   placeholder="Type your answer..."
+                   autocomplete="off">
         </div>
-        <button class="btn btn-primary" type="submit">Submit answer</button>
+        <div class="question-actions">
+            <button class="btn btn-primary" type="submit">Submit answer</button>
+        </div>
     </form>
 </div>
 
 {% elif current_step.type == "P" %}
+<!-- === PROGRAMMING === -->
 <div class="question-card">
-    <p class="question-text">{{ current_step.question_text }}</p>
-    <form hx-post="{% url 'submission:submit' lesson.public_id %}"
+    <div class="question-text">{{ current_step.question_text|safe }}</div>
+    <form hx-post="{% url 'submissions:submit' lesson.public_id %}"
           hx-target="#step-content"
           hx-swap="innerHTML">
         {% csrf_token %}
@@ -58,7 +69,126 @@
                       class="code-editor"
                       spellcheck="false">{{ current_step.solution_template }}</textarea>
         </div>
-        <button class="btn btn-primary" type="submit">Run code</button>
+        <div class="question-actions">
+            <button class="btn btn-primary" type="submit">Run code</button>
+        </div>
     </form>
 </div>
 {% endif %}
+
+<style>
+    /* === THEORY === */
+    .theory-content {
+        line-height: 1.8;
+        font-size: 0.95rem;
+        color: var(--text);
+    }
+
+    .theory-content h2,
+    .theory-content h3 {
+        margin-top: 1.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .theory-content p { margin-bottom: 1rem; }
+
+    .theory-content code {
+        background: var(--bg-hover);
+        padding: 0.15rem 0.4rem;
+        border-radius: 4px;
+        font-family: var(--font-mono);
+        font-size: 0.85em;
+    }
+
+    .theory-content pre {
+        background: var(--bg-hover);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.25rem;
+        overflow-x: auto;
+        margin-bottom: 1rem;
+    }
+
+    .theory-content img {
+        max-width: 100%;
+        border-radius: var(--radius);
+        margin: 1rem 0;
+    }
+
+    /* === QUESTION CARD === */
+    .question-card {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .question-text {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--text);
+        line-height: 1.6;
+        margin: 0;
+        padding: 1.25rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+    }
+
+    /* === OPTIONS === */
+    .options-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .option-label {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.85rem 1rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: var(--text-dim);
+        transition: border-color 0.15s, background 0.15s, color 0.15s;
+        user-select: none;
+    }
+
+    .option-label:hover {
+        border-color: var(--accent);
+        background: var(--accent-glow);
+        color: var(--text);
+    }
+
+    .option-label input { accent-color: var(--accent); }
+
+    /* === CODE EDITOR === */
+    .code-editor {
+        width: 100%;
+        min-height: 240px;
+        background: #0d0d14;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1rem;
+        font-family: var(--font-mono);
+        font-size: 0.88rem;
+        color: #e8e8f0;
+        resize: vertical;
+        line-height: 1.6;
+        tab-size: 4;
+    }
+
+    .code-editor:focus {
+        outline: none;
+        border-color: var(--accent);
+    }
+
+    /* === ACTIONS === */
+    .question-actions {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+    }
+</style>

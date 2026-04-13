@@ -3,9 +3,12 @@
 
 {% block title %}{{ lesson.title }} — {{ course.title }}{% endblock %}
 
+{% block main_class %}main--full{% endblock %}
+
 {% block content %}
 <div class="lesson-layout">
 
+    <!-- ==== SIDEBAR ==== -->
     <aside class="lesson-sidebar">
 
         <div class="lesson-breadcrumb">
@@ -14,21 +17,22 @@
 
         <div class="sidebar-lesson-title">{{ lesson.title }}</div>
 
-        <div class="steps-nav" id="steps-nav">
-        {% for step in steps %}
-            <a href="?step={{ step.order }}"
-            class="step-link {% if step.order == current_step.order %}active{% endif %}">
-                <span class="step-index">{{ step.order }}</span>
-                <span class="step-name">{{ step.title }}</span>
-            </a>
-        {% endfor %}
+        <div class="steps-nav">
+            {% for step in steps %}
+                <a href="?step={{ step.order }}"
+                   class="step-link {% if step.order == current_step.order %}active{% endif %}">
+                    <span class="step-index">{{ step.order }}</span>
+                    <span class="step-name">{{ step.title }}</span>
+                </a>
+            {% endfor %}
         </div>
 
     </aside>
 
+    <!-- ==== MAIN ==== -->
     <main class="lesson-main">
 
-        <div class="step-header" id="step-header">
+        <div class="step-header">
             <span class="step-counter">Step {{ current_step.order }} of {{ steps|length }}</span>
             <h1 class="step-title">{{ current_step.title }}</h1>
         </div>
@@ -40,10 +44,6 @@
         <div class="step-nav-btns">
             {% if current_step.order > 1 %}
                 <a href="?step={{ current_step.order|add:'-1' }}"
-                   hx-get="?step={{ current_step.order|add:'-1' }}"
-                   hx-target="#step-content"
-                   hx-swap="innerHTML"
-                   hx-push-url="true"
                    class="btn btn-ghost">← Previous</a>
             {% else %}
                 <span></span>
@@ -51,14 +51,10 @@
 
             {% if current_step.order < steps|length %}
                 <a href="?step={{ current_step.order|add:'1' }}"
-                   hx-get="?step={{ current_step.order|add:'1' }}"
-                   hx-target="#step-content"
-                   hx-swap="innerHTML"
-                   hx-push-url="true"
                    class="btn btn-primary">Next →</a>
             {% else %}
                 <a href="{% url 'courses:course_detail' course.slug %}"
-                   class="btn btn-primary">Finish lesson ✓</a>
+                   class="btn btn-primary">Complete lesson ✓</a>
             {% endif %}
         </div>
 
@@ -74,9 +70,9 @@
         grid-template-columns: 280px 1fr;
         gap: 0;
         min-height: calc(100vh - var(--nav-h));
-        margin: 0 -2rem;
     }
 
+    /* ==== SIDEBAR ==== */
     .lesson-sidebar {
         background: var(--bg-card);
         border-right: 1px solid var(--border);
@@ -141,27 +137,16 @@
     .step-index { font-size: 0.7rem; color: var(--text-faint); min-width: 1rem; }
     .step-name { flex: 1; }
 
+    /* ==== MAIN ==== */
     .lesson-main {
         padding: 2.5rem 3rem;
         max-width: 780px;
         display: flex;
         flex-direction: column;
         gap: 2rem;
-
-        background: linear-gradient(
-            180deg,
-            #332b40 0%,
-            #2d2637 60%,
-            #272131 100%
-        );
-
-        border-radius: border-radius: 0 14px 14px 0;
-
-        box-shadow: 
-            0 8px 24px rgba(0,0,0,0.25),
-            inset 0 1px 0 rgba(255,255,255,0.04); /* soft fade/light */
-
-        transition: box-shadow 0.25s ease;
+        background: linear-gradient(180deg, #332b40 0%, #2d2637 60%, #272131 100%);
+        border-radius: 0 14px 14px 0;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.04);
     }
 
     .step-header { display: flex; flex-direction: column; gap: 0.4rem; }
@@ -184,10 +169,11 @@
         margin-top: auto;
     }
 
-    /* === STEP CONTENT STYLES === */
+    /* ==== STEP CONTENT ==== */
     .theory-content { line-height: 1.8; font-size: 0.95rem; color: var(--text); }
     .theory-content h2, .theory-content h3 { margin-top: 1.5rem; }
-    .theory-content p { margin-bottom: 1rem; }
+    .theory-content p { margin-bottom: 1rem; text-align: inherit; }
+    .theory-content img { max-width: 100%; height: auto; border-radius: var(--radius); margin: 1rem 0; }
     .theory-content code {
         background: var(--bg-hover);
         padding: 0.15rem 0.4rem;
@@ -202,19 +188,9 @@
         padding: 1rem;
         overflow-x: auto;
     }
-    .theory-content img {
-    max-width: 100%;
-    height: auto;
-    }
-
-.theory-content p {
-    text-align: inherit;
-}
 
     .question-card { display: flex; flex-direction: column; gap: 1.25rem; }
-
     .question-text { font-size: 1.05rem; font-weight: 600; color: var(--text); line-height: 1.6; }
-
     .options-list { display: flex; flex-direction: column; gap: 0.5rem; }
 
     .option-label {
@@ -255,9 +231,9 @@
     .code-editor:focus { outline: none; border-color: var(--accent); }
 
     @media (max-width: 768px) {
-        .lesson-layout { grid-template-columns: 1fr; margin: 0; }
+        .lesson-layout { grid-template-columns: 1fr; }
         .lesson-sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
-        .lesson-main { padding: 1.5rem 1rem; }
+        .lesson-main { padding: 1.5rem 1rem; border-radius: 0; }
     }
 </style>
 {% endblock %}

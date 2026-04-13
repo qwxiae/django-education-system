@@ -22,7 +22,7 @@
         {% endif %}
         <h1 class="course-title">{{ course.title }}</h1>
         <p class="course-meta">
-            By <strong>{{ course.author.username }}</strong>
+            By <strong><a href={% url 'users:public_profile' course.author.username %}>{{ course.author.username }}</a></strong>
             &nbsp;·&nbsp;
             {{ course.modules_count }} module{% if course.modules_count != 1 %}s{% endif %}
         </p>
@@ -33,7 +33,7 @@
         {% if course.description %}
         <section class="course-section">
             <h2>About this course</h2>
-            <p>{{ course.description }}</p>
+            <p>{{ course.description|safe }}</p>
         </section>
         {% endif %}
 
@@ -109,7 +109,7 @@
                     </li>
                     <li>
                         <span class="fact-label">Author</span>
-                        <span class="fact-value">{{ course.author.username }}</span>
+                        <strong><a href={% url 'users:public_profile' course.author.username %}>{{ course.author.username }}</a></strong>
                     </li>
                     {% if course.category %}
                     <li>

@@ -1,0 +1,143 @@
+{% if pending %}
+<div class="result result-pending">
+    <div class="result-icon">⏳</div>
+    <h3 class="result-title">Running tests...</h3>
+    <p class="result-desc">Your code is being evaluated against all test cases.</p>
+    <div hx-get="{% url 'submission:result' submission_id %}"
+         hx-trigger="every 2s"
+         hx-target="this"
+         hx-swap="outerHTML">
+    </div>
+</div>
+
+{% elif is_correct %}
+<div class="result result-correct">
+    <div class="result-icon">✓</div>
+    <h3 class="result-title">Correct!</h3>
+    <p class="result-desc">Well done. You got it right.</p>
+</div>
+
+<div class="result-actions">
+    <a href="?step={{ step.order }}" class="btn btn-ghost">Try again</a>
+</div>
+
+{% else %}
+<div class="result result-wrong">
+    <div class="result-icon">✗</div>
+    <h3 class="result-title">Not quite.</h3>
+    <p class="result-desc">Review your answer and try again.</p>
+
+<!--
+    {% if correct_answer %}
+    <div class="result-answer">
+        <span class="result-answer-label">Correct answer</span>
+        <span class="result-answer-value">{{ correct_answer }}</span>
+    </div>
+    {% endif %}
+    
+    {% if correct_options %}
+    <div class="result-answer">
+        <span class="result-answer-label">Correct options</span>
+        <div class="result-options">
+            {% for opt in correct_options %}
+            <span class="badge badge-success">{{ opt.text }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+-->
+    
+    <div class="result-actions">
+        <a href="?step={{ step.order }}" class="btn btn-ghost">Try again</a>
+    </div>
+</div>
+
+
+
+</div>
+{% endif %}
+
+<style>
+    .result {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 1.5rem;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        margin-top: 1rem;
+    }
+
+    .result-correct {
+        background: rgba(61, 214, 140, 0.08);
+        border-color: rgba(61, 214, 140, 0.3);
+    }
+
+    .result-wrong {
+        background: rgba(240, 91, 91, 0.08);
+        border-color: rgba(240, 91, 91, 0.3);
+    }
+
+    .result-pending {
+        background: rgba(83, 96, 211, 0.08);
+        border-color: rgba(83, 96, 211, 0.3);
+    }
+
+    .result-icon {
+        font-size: 1.5rem;
+        line-height: 1;
+    }
+
+    .result-correct .result-icon { color: var(--success); }
+    .result-wrong   .result-icon { color: var(--danger); }
+    .result-pending .result-icon { color: var(--accent); }
+
+    .result-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin: 0;
+        color: var(--text);
+    }
+
+    .result-desc {
+        font-size: 0.85rem;
+        color: var(--text-dim);
+        margin: 0;
+    }
+
+    .result-answer {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        background: var(--bg-hover);
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+    }
+
+    .result-answer-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-dim);
+    }
+
+    .result-answer-value {
+        font-weight: 600;
+        color: var(--text);
+        font-family: var(--font-mono);
+    }
+
+    .result-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-top: 0.25rem;
+    }
+
+    .result-actions {
+        margin-top: 0.25rem;
+    }
+</style>
