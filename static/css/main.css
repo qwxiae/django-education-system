@@ -1,10 +1,8 @@
 /* === TOKENS === */
 :root {
-    /* --bg:        #0a0a0f; */
-    --bg:        #1d1d29;
+    --bg:        #1b1b1f;
     --bg-card:   #111118;
     --bg-hover:  #16161f;
-    /* --border:    #1e1e2e; */
     --border:    #454558;
     --border-hi: #2e2e45;
     --accent:    #975bd6;
@@ -14,7 +12,6 @@
     --danger:    #f05b5b;
     --text:      #e8e8f0;
     --text-dim:  #ffffff;
-    /* --text-faint:#3a3a55; */
     --text-faint:#bbbbd6;
     --font-head: 'Syne', sans-serif;
     --font-mono: 'DM Mono', monospace;
@@ -155,7 +152,8 @@ body {
     background: var(--bg);
     color: var(--text);
     font-family: var(--font-mono);
-    font-size: 15px;
+    /* font-size: 15px; */
+    font-size: 17px;
     /* line-height x font-size */
     line-height: 1.65;
     /* <body> is at least as tall as the viewport height */

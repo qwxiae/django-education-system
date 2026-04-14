@@ -5,7 +5,6 @@ import os
 
 ENVIRONMENT = config("ENVIRONMENT", default="development")
 
-
 def get_secret(name, env_var, default=None, cast=str):
     secret_path = f"/run/secrets/{name}"
     if os.path.exists(secret_path):
@@ -25,6 +24,14 @@ ALLOWED_HOSTS = get_secret(
 ).split(",")
 
 
+PROJECT_APPS = [
+    "apps.users",
+    "apps.courses",
+    "apps.lessons",
+    "apps.submissions",
+    # "apps.analytics",
+]
+
 INSTALLED_APPS = [
     "jazzmin",
     "django.contrib.admin",
@@ -35,13 +42,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_extensions",
     "tinymce",
-    "apps.users",
-    "apps.courses",
-    "apps.lessons",
-    "apps.submissions",
-    # "apps.analytics",
-    # "apps.notifications",
-]
+    "django_celery_results",
+] + PROJECT_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -53,7 +55,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-# settings.py
+
+# whitenoise used in production
 if ENVIRONMENT == "production":
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 else:
@@ -64,7 +67,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        # === templates are at same level as base app
+        # templates are at same level as base app
         "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
@@ -151,16 +154,13 @@ if ENVIRONMENT == "production":
         }
     }
 
-
+# === Auth ===
 EMAIL_HOST = get_secret("email_host", "EMAIL_HOST", default="localhost")
-
 LOGIN_URL = "users:login"
 
 
-# === Needed for debugtoolbar
-
-
-# === Debug toolbar does not start in tests
+# Debugtoolbar does not start in tests
+# Needed for debugtoolbar
 TESTING = "test" in sys.argv or "PYTEST_VERSION" in os.environ
 
 if not TESTING and DEBUG:
@@ -234,3 +234,19 @@ JAZZMIN_UI_TWEAKS = {
         "success": "btn-success",
     },
 }
+
+
+# === Celery ===
+CELERY_BROKER_URL = get_secret(
+    "rabbitmq_url",
+    "RABBITMQ_URL",
+    default="amqp://guest:guest@localhost:5672//"
+)
+
+# stores results in postgres
+CELERY_RESULT_BACKEND = "django-db"
+CELERY_CACHE_BACKEND = "django-cache"
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "UTC"

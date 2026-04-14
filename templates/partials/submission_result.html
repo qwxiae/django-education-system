@@ -1,20 +1,24 @@
 {% if pending %}
-<div class="result result-pending">
+
+<div class="result result-pending"
+     hx-get="{% url 'submissions:result' submission_id %}"
+     hx-trigger="every 2s"
+     hx-swap="outerHTML">
+
     <div class="result-icon">⏳</div>
     <h3 class="result-title">Running tests...</h3>
     <p class="result-desc">Your code is being evaluated against all test cases.</p>
-    <div hx-get="{% url 'submission:result' submission_id %}"
-         hx-trigger="every 2s"
-         hx-target="this"
-         hx-swap="outerHTML">
-    </div>
+
 </div>
 
 {% elif is_correct %}
+
 <div class="result result-correct">
-    <div class="result-icon">✓</div>
+    <div class="result-icon">✅</div>
     <h3 class="result-title">Correct!</h3>
-    <p class="result-desc">Well done. You got it right.</p>
+    <p class="result-desc">
+        Passed {{ tests_passed }}/{{ tests_total }} tests.
+    </p>
 </div>
 
 <div class="result-actions">
@@ -22,39 +26,19 @@
 </div>
 
 {% else %}
-<div class="result result-wrong">
-    <div class="result-icon">✗</div>
-    <h3 class="result-title">Not quite.</h3>
-    <p class="result-desc">Review your answer and try again.</p>
 
-<!--
-    {% if correct_answer %}
-    <div class="result-answer">
-        <span class="result-answer-label">Correct answer</span>
-        <span class="result-answer-value">{{ correct_answer }}</span>
-    </div>
-    {% endif %}
-    
-    {% if correct_options %}
-    <div class="result-answer">
-        <span class="result-answer-label">Correct options</span>
-        <div class="result-options">
-            {% for opt in correct_options %}
-            <span class="badge badge-success">{{ opt.text }}</span>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
--->
-    
+<div class="result result-wrong">
+    <div class="result-icon">❌</div>
+    <h3 class="result-title">Not quite.</h3>
+    <p class="result-desc">
+        Passed {{ tests_passed|default:0 }}/{{ tests_total|default:0 }} tests.
+    </p>
+
     <div class="result-actions">
         <a href="?step={{ step.order }}" class="btn btn-ghost">Try again</a>
     </div>
 </div>
 
-
-
-</div>
 {% endif %}
 
 <style>
