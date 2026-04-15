@@ -6,6 +6,9 @@ from django.http import HttpResponse
 from apps.lessons.models import Step, ChoiceStep, TextInputStep, ProgrammingStep
 from .models import Submission, ChoiceSubmission, TextSubmission, CodeSubmission
 from .tasks import run_code_submission
+from django.db import transaction
+from django.core.exceptions import ObjectDoesNotExist
+
 
 @login_required
 @require_POST
@@ -13,7 +16,6 @@ def submit_view(request, lesson_id):
     step_id = request.POST.get("step_id")
     step = get_object_or_404(Step, pk=step_id)
 
-    # base submission
     submission = Submission.objects.create(
         user=request.user,
         step=step,
@@ -66,6 +68,7 @@ def submit_view(request, lesson_id):
         submission.status = Submission.Status.CORRECT if is_correct else Submission.Status.WRONG
         submission.save()
 
+
         return render(request, "partials/submission_result.html", {
             "is_correct": is_correct,
             "correct_options": correct_options if not is_correct else None,
@@ -75,7 +78,6 @@ def submit_view(request, lesson_id):
     
     elif step.type == Step.StepType.CODE:
         from .tasks import run_code_submission
-
         prog_step = get_object_or_404(ProgrammingStep, pk=step.pk)
         source_code = request.POST.get("code", "")
 
@@ -84,10 +86,16 @@ def submit_view(request, lesson_id):
             source_code=source_code,
             tests_total=prog_step.test_cases.count()
         )
+        
+        try:
+            code_sub = CodeSubmission.objects.get(pk=code_sub.pk)
+        except ObjectDoesNotExist:
+            raise self.retry(countdown=1, max_retries=10)
 
-        # Send async task
-        run_code_submission.delay(code_sub.pk)
-
+        transaction.on_commit(
+            lambda: run_code_submission.delay(code_sub.pk)
+        )
+        
         return render(request, "partials/submission_result.html", {
             "is_correct": None,  # pending
             "pending": True,

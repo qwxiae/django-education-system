@@ -16,7 +16,6 @@ class Submission(models.Model):
     )
     step = models.ForeignKey(Step, on_delete=models.CASCADE, related_name="submissions")
     status = models.CharField(choices=Status, max_length=1, default=Status.PENDING)
-    # TimeField only adds time; we need both date and time
     submitted_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -26,7 +25,6 @@ class Submission(models.Model):
         indexes = [models.Index(fields=["user", "step"])]
 
     def __str__(self):
-        # user_id is already loaded, user fetches the user (+1 query)
 
         return f"Submission(user={self.user_id}, step={self.step_id})"
 
