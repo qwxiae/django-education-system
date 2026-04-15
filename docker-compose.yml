@@ -3,6 +3,7 @@ services:
     env_file: .env
     environment:
       - ENVIRONMENT=production
+      - PYTHONUNBUFFERED=1
     build:
       context: .
       dockerfile: infra/docker/Dockerfile
@@ -16,7 +17,39 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      
+      rabbitmq:
+        condition: service_healthy
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq 
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_running"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  celery:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile
+    environment:
+    - PYTHONUNBUFFERED=1
+    - ENVIRONMENT=production
+    command: celery -A config worker --loglevel=info
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - rabbitmq
+
+  
   db:
     image: postgres:14.6-alpine
     env_file: .env
@@ -53,21 +86,6 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  rabbitmq_data:
 
-  # celery:
-  #   build:
-  #   context: .
-  #   dockerfile: Dockerfile.celery
-  #   command: celery -A config worker -l info
-  #   environment:
-  #     - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
-  #     - REDIS_URL=redis://redis:6379/0
-  #   depends_on:
-  #     db:
-  #       condition: service_healthy
-  #     redis:
-  #       condition: service_healthy
-
-
-  # redis_data:
       
