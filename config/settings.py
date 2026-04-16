@@ -291,3 +291,6 @@ LOGGING = {
         },
     },
 }
+
+# === SANDBOX ===
+PISTON_URL = get_secret("piston_url", "PISTON_URL", default="http://piston:2000")

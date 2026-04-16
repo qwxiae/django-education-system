@@ -9,5 +9,5 @@ urlpatterns = [
     # /courses/{course_id}/modules/{module_id}/lessons/{lesson_id}/attempts/{attempt_id}:
     path("attempts/<str:p_id>", views.attempt_detail, name="attempt_detail"),
     path("lessons/<str:lesson_id>/submit/", views.submit_view, name="submit"),
-    path("result/<int:submission_id>/", views.result_view, name="result"),
+    path("submissions/<int:submission_id>/result/", views.submission_result_view, name="result"),
 ]

@@ -83,7 +83,17 @@ services:
       timeout: 5s
       retries: 5
 
+  piston:
+    image: ghcr.io/engineer-man/piston
+    privileged: true        # required for isolate sandboxing
+    ports:
+      - "2000:2000"
+    volumes:
+      - piston_data:/piston/data
+    restart: always
+
 volumes:
+  piston_data:            
   postgres_data:
   redis_data:
   rabbitmq_data:

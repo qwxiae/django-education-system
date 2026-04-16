@@ -81,4 +81,5 @@ dependencies = [
     "ruff>=0.15.5",
     "pre-commit>=4.5.1",
     "django-celery-results>=2.6.0",
+    "requests>=2.33.1",
 ]

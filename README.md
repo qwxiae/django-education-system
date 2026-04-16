@@ -168,3 +168,14 @@ python manage.py createsuperuser
 ```sh
 docker compose up
 ```
+
+Для установки языков программирования в Piston sandbox:
+```sh
+# install Python 3.10
+curl -X POST http://localhost:2000/api/v2/packages \
+  -H "Content-Type: application/json" \
+  -d '{"language": "python", "version": "3.10.0"}'
+
+# verify it installed
+curl http://localhost:2000/api/v2/runtimes
+```

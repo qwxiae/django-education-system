@@ -1,12 +1,50 @@
-import subprocess
-import tempfile
-import os
+import requests
 from celery import shared_task
-from django.utils import timezone
+from django.conf import settings
+from django.db import transaction
+import logging
+
+logging.getLogger()
+
+def execute_with_piston(source_code, stdin="", language="python", version="3.10.0"):
+    try:
+        response = requests.post(
+            f"{settings.PISTON_URL}/api/v2/execute",
+            json={
+                "language": language,
+                "version": version,
+                "files": [{"content": source_code}],
+                "stdin": stdin or "",
+                "run_timeout": 3000,        # 5 seconds max
+                "compile_timeout": 10000,
+                "run_memory_limit": 128 * 1024 * 1024, # 128MB max
+            },
+            timeout=15  # HTTP request timeout
+        )
+        logging.info("PISTON RAW RESPONSE:", response.text)
+        response.raise_for_status()
+        data = response.json()
+        run = data.get("run", {})
+
+        return {
+            "output": run.get("stdout", ""),
+            "error": run.get("stderr", ""),
+            "runtime_ms": int(float(run.get("cpu_time", 0)) * 1000),
+            "timed_out": run.get("code") == 124,  # 124 = timeout exit code
+        }
+
+    except requests.RequestException as e:
+        return {
+            "output": "",
+            "error": f"Execution service unavailable: {str(e)}",
+            "runtime_ms": 0,
+            "timed_out": False,
+        }
+
 
 @shared_task(bind=True, max_retries=3)
 def run_code_submission(self, code_submission_id):
-    from .models import CodeSubmission, TestCaseResult
+    from .models import CodeSubmission, TestCaseResult, Submission
     from apps.lessons.models import ProgrammingStep
 
     try:
@@ -18,35 +56,37 @@ def run_code_submission(self, code_submission_id):
             "test_cases"
         ).get(pk=code_sub.submission.step_id)
 
-        test_cases = prog_step.test_cases.all()
+        test_cases = list(prog_step.test_cases.all())
         passed = 0
 
         for test_case in test_cases:
-            result = execute_python(
-                code=code_sub.source_code,
+            result = execute_with_piston(
+                source_code=code_sub.source_code,
                 stdin=test_case.input_data,
-                time_limit_ms=prog_step.time_limit_ms,
-                memory_limit_mb=prog_step.memory_limit_mb,
             )
 
-            is_passed = result["output"].strip() == test_case.expected_output.strip()
+            # normalize output for comparison
+            actual = result["output"].strip()
+            expected = test_case.expected_output.strip()
+            is_passed = actual == expected and not result["timed_out"]
+
             if is_passed:
                 passed += 1
 
-            TestCaseResult.objects.create(
+            TestCaseResult.objects.update_or_create(
                 submission=code_sub,
                 test_case=test_case,
-                passed=is_passed,
-                actual_output=result["output"],
-                runtime_ms=result["runtime_ms"],
-                memory_mb=0,
+                defaults={
+                    "passed": is_passed,
+                    "actual_output": result["output"] or result["error"],
+                    "runtime_ms": result["runtime_ms"],
+                }
             )
 
         code_sub.tests_passed = passed
         code_sub.tests_total = len(test_cases)
         code_sub.save()
 
-        from .models import Submission
         submission = code_sub.submission
         submission.status = (
             Submission.Status.CORRECT
@@ -55,43 +95,7 @@ def run_code_submission(self, code_submission_id):
         )
         submission.save()
 
+    except CodeSubmission.DoesNotExist as exc:
+        raise self.retry(exc=exc, countdown=5)
     except Exception as exc:
         raise self.retry(exc=exc, countdown=5)
-
-
-def execute_python(code, stdin, time_limit_ms, memory_limit_mb):
-    import time
-
-    with tempfile.NamedTemporaryFile(
-        mode="w",
-        suffix=".py",
-        delete=False
-    ) as f:
-        f.write(code)
-        tmp_path = f.name
-
-    try:
-        start = time.monotonic()
-        result = subprocess.run(
-            ["python", tmp_path],
-            input=stdin or "",
-            capture_output=True,
-            text=True,
-            timeout=time_limit_ms / 1000,
-        )
-        elapsed_ms = int((time.monotonic() - start) * 1000)
-
-        return {
-            "output": result.stdout,
-            "error": result.stderr,
-            "runtime_ms": elapsed_ms,
-        }
-
-    except subprocess.TimeoutExpired:
-        return {
-            "output": "",
-            "error": "Time limit exceeded",
-            "runtime_ms": time_limit_ms,
-        }
-    finally:
-        os.unlink(tmp_path)

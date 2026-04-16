@@ -77,8 +77,10 @@ def submit_view(request, lesson_id):
         })
     
     elif step.type == Step.StepType.CODE:
-        from .tasks import run_code_submission
-        prog_step = get_object_or_404(ProgrammingStep, pk=step.pk)
+        prog_step = get_object_or_404(
+                ProgrammingStep.objects.prefetch_related("test_cases"),
+                pk=step.pk
+        )
         source_code = request.POST.get("code", "")
 
         code_sub = CodeSubmission.objects.create(
@@ -86,18 +88,13 @@ def submit_view(request, lesson_id):
             source_code=source_code,
             tests_total=prog_step.test_cases.count()
         )
-        
-        try:
-            code_sub = CodeSubmission.objects.get(pk=code_sub.pk)
-        except ObjectDoesNotExist:
-            raise self.retry(countdown=1, max_retries=10)
 
+        # fire AFTER transaction commits; fixes DoesNotExist race condition
         transaction.on_commit(
             lambda: run_code_submission.delay(code_sub.pk)
         )
-        
+
         return render(request, "partials/submission_result.html", {
-            "is_correct": None,  # pending
             "pending": True,
             "submission_id": submission.pk,
             "step": prog_step,
@@ -106,34 +103,31 @@ def submit_view(request, lesson_id):
 
     return HttpResponse(status=400)
 
-def result_view(request, submission_id: int):
-    submission = get_object_or_404(Submission, pk=submission_id)
-
-    context = {
-        "submission": submission,
-        "submission_id": submission.id,
-        "step": submission.step,
-    }
+# apps/submissions/views.py
+def submission_result_view(request, submission_id):
+    from .models import Submission
+    submission = get_object_or_404(
+        Submission.objects.select_related("code_submission", "step"),
+        pk=submission_id,
+        user=request.user
+    )
 
     if submission.status == Submission.Status.PENDING:
-        context["pending"] = True
-        return render(request, "partials/submission_result.html", context)
-
-    try:
-        code_sub = CodeSubmission.objects.get(submission=submission)
-        context.update({
-            "pending": False,
-            "is_correct": submission.status == Submission.Status.CORRECT,
-            "tests_passed": code_sub.tests_passed,
-            "tests_total": code_sub.tests_total,
-        })
-    except CodeSubmission.DoesNotExist:
-        context.update({
-            "pending": False,
-            "is_correct": False,
+        return render(request, "partials/submission_result.html", {
+            "step": submission.step,
+            "pending": True,
+            "submission_id": submission_id,
         })
 
-    return render(request, "partials/submission_result.html", context)
+    code_sub = submission.code_submission
+    return render(request, "partials/submission_result.html", {
+        "step": submission.step,
+        "pending": False,
+        "is_correct": submission.status == Submission.Status.CORRECT,
+        "tests_passed": code_sub.tests_passed,
+        "tests_total": code_sub.tests_total,
+        "test_results": code_sub.test_results.select_related("test_case").all(),
+    })
 
 def attempt_detail(request):
     pass
