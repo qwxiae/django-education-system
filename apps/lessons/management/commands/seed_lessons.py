@@ -67,7 +67,7 @@ class Command(BaseCommand):
             lesson=about,
             order=3,
             defaults={
-                "title": "Hello World!",
+                "title": "Hello World",
                 "question_text": "Write a program that prints 'Hello, World'",
                 "language": ProgrammingStep.ProgLang.PYTHON,
                 "solution_template": "# Write your solution here\n",

@@ -2,11 +2,23 @@ from django.db import models
 from apps.courses.models import Module
 from django.urls import reverse
 import random
+import shortuuid
 
+import shortuuid
+from django.db import models
+
+def default_public_id():
+    return shortuuid.uuid()
 
 class Lesson(models.Model):
     module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name="lessons")
-    public_id = models.CharField(max_length=6, unique=True, editable=False)
+    public_id = models.CharField(
+        max_length=22,
+        unique=True,
+        editable=False,
+        default=default_public_id,
+        db_index=True,
+    )
     title = models.CharField(max_length=255, blank=False)
     is_published = models.BooleanField(default=False)
     order = models.PositiveSmallIntegerField(default=0)
@@ -16,28 +28,11 @@ class Lesson(models.Model):
         unique_together = [("module", "order")]
         ordering = ["order"]
 
-    def save(self, *args, **kwargs):
-        if not self.public_id:
-            while True:
-                candidate = str(random.randint(100_000, 999_999))
-                if not Lesson.objects.filter(public_id=candidate).exists():
-                    self.public_id = candidate
-                    break
-        super().save(*args, **kwargs)
-
     def get_absolute_url(self):
         return reverse("lessons:lesson", kwargs={"public_id": self.public_id})
 
     def __str__(self):
         return f"Lesson(module={self.module.title}, title={self.title})"
-
-    def save(self, *args, **kwargs):
-        if not self.pk and not self.order:
-            last = Lesson.objects.filter(module=self.module).aggregate(
-                max_order=models.Max("order")
-            )["max_order"] or 0
-            self.order = last + 1
-        super().save(*args, **kwargs)
 
 class Step(models.Model):
     class StepType(models.TextChoices):
@@ -138,7 +133,7 @@ class TestCase(models.Model):
     step = models.ForeignKey(
         ProgrammingStep, on_delete=models.CASCADE, related_name="test_cases"
     )
-    input_data = models.TextField()
+    input_data = models.TextField(default="", blank=True)
     expected_output = models.TextField()
     order = models.PositiveSmallIntegerField()
 
