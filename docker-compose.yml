@@ -19,11 +19,12 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    ports:
-      - "5672:5672"
-      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq 
     healthcheck:
@@ -37,8 +38,8 @@ services:
       context: .
       dockerfile: infra/docker/Dockerfile
     environment:
-    - PYTHONUNBUFFERED=1
-    - ENVIRONMENT=production
+      - PYTHONUNBUFFERED=1
+      - ENVIRONMENT=production
     command: celery -A config worker --loglevel=info
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -49,7 +50,6 @@ services:
       - db
       - rabbitmq
 
-  
   db:
     image: postgres:14.6-alpine
     env_file: .env
@@ -60,14 +60,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
-  redisinsight:
-    image: redis/redisinsight:latest
-    ports:
-      - "5540:5540"
-    depends_on:
-      redis:
-        condition: service_healthy
 
   redis:
     image: redis:7-alpine
@@ -84,13 +76,11 @@ services:
       retries: 5
 
   piston:
-    image: ghcr.io/engineer-man/piston
+    image: ghcr.io/engineer-man/piston:latest
     privileged: true        # required for isolate sandboxing
-    ports:
-      - "2000:2000"
+    restart: always
     volumes:
       - piston_data:/piston/data
-    restart: always
 
 volumes:
   piston_data:            

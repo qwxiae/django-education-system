@@ -33,7 +33,10 @@ RUN pip install --prefix=/install --no-cache-dir -r requirements.txt
 FROM python:3.12-slim
 
 WORKDIR /app
-
+# needed to run Piston
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 # === Copy installed Python packages from builder ===
 COPY --from=builder /install /usr/local
 

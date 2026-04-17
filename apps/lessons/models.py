@@ -53,14 +53,6 @@ class Step(models.Model):
         ]
         ordering = ["order"]
 
-    @property
-    def is_exercise(self):
-        return self.type in {
-            self.StepType.CHOICE,
-            self.StepType.TEXT_INPUT,
-            self.StepType.CODE,
-        }
-
     def __str__(self):
         return f"Step(lesson={self.lesson_id}, order={self.order}, type={self.type})"
 

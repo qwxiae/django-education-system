@@ -54,7 +54,7 @@ class User(AbstractUser):
         db_table = "users_user"
 
     def __str__(self):
-        return self.email or "No email"
+        return f"User(email={self.email})" or "No email"
 
 
 class Profile(models.Model):
@@ -75,7 +75,7 @@ class Profile(models.Model):
         db_table = "users_profile"
 
     def __str__(self):
-        return f"Profile({self.user.email})"
+        return f"Profile(email={self.user.email})"
 
 
 class Role(models.Model):
@@ -86,7 +86,7 @@ class Role(models.Model):
         db_table = "users_role"
 
     def __str__(self):
-        return self.name
+        return f"Role(name={self.name})"
 
 
 class UserRole(models.Model):

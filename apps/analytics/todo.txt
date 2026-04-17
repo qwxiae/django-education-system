@@ -1,4 +1,0 @@
-Why analytics/ is separate from courses/? Analytics has its own 
-write pattern (event-driven, aggregated via Celery) vs. courses
- which are standard CRUD. Separating them also lets you cache analytics
-  data in Redis independently without touching course logic.

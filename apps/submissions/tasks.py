@@ -15,11 +15,11 @@ def execute_with_piston(source_code, stdin="", language="python", version="3.10.
                 "version": version,
                 "files": [{"content": source_code}],
                 "stdin": stdin or "",
-                "run_timeout": 3000,        # 5 seconds max
+                "run_timeout": 3000,        # 3 sec - how long can code be run inside Piston
                 "compile_timeout": 10000,
                 "run_memory_limit": 128 * 1024 * 1024, # 128MB max
             },
-            timeout=15  # HTTP request timeout
+            timeout=15  # HTTP request timeout; how long to wait for piston to reply
         )
         logging.info("PISTON RAW RESPONSE:", response.text)
         response.raise_for_status()
