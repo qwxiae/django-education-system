@@ -122,17 +122,17 @@ class Enrollment(models.Model):
 
     @property
     def progress_percentage(self):
-        """
-        Based on lesson count as percentage can be derived
-        from lesson count but not vice versa
-        """
-        result = self.course.modules.aggregate(total=Count("lessons"))
+        from apps.lessons.models import Step
 
-        total = result["total"] or 0
+        total = Step.objects.filter(
+            lesson__module__course=self.course,
+            type__in=["C", "I", "P"]
+        ).count()
+
         if total == 0:
             return 0
-
-        return round(self.progress / total * 100)
+        return min(round(self.progress / total * 100), 100)
+    
 
     class Meta:
         db_table = "courses_enrollment"

@@ -30,7 +30,7 @@ PROJECT_APPS = [
     "apps.lessons",
     "apps.submissions",
     "apps.core",
-    # "apps.analytics",
+    "apps.analytics",
 ]
 
 INSTALLED_APPS = [
@@ -153,6 +153,13 @@ if ENVIRONMENT == "production":
             "OPTIONS": {
                 "CLIENT_CLASS": "django_redis.client.DefaultClient",
             },
+        }
+    }
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "local-cache",
         }
     }
 
