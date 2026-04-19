@@ -1,7 +1,8 @@
-from django.test import TestCase, Client
-from .models import User, Profile, Role, UserRole
-from django.urls import reverse
 from django.db.models import ProtectedError
+from django.test import Client, TestCase
+from django.urls import reverse
+
+from .models import Profile, Role, User, UserRole
 
 
 class BaseTestCase(TestCase):

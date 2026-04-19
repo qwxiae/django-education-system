@@ -1,6 +1,7 @@
-from django.db import models
-from apps.lessons.models import Step, TestCase
 from django.contrib.auth import get_user_model
+from django.db import models
+
+from apps.lessons.models import Step, TestCase
 
 User = get_user_model()
 

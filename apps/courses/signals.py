@@ -1,6 +1,7 @@
-from django.db.models.signals import post_delete
 from django.contrib.auth import get_user_model
+from django.db.models.signals import post_delete
 from django.dispatch import receiver
+
 from .models import Course
 
 User = get_user_model()

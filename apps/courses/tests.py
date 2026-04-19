@@ -1,9 +1,11 @@
-from django.test import TestCase, Client
-from .models import Category, Course, Module, Enrollment
 from django.contrib.auth import get_user_model
-from django.urls import reverse
 from django.db.utils import IntegrityError
+from django.test import Client, TestCase
+from django.urls import reverse
+
 from apps.users.models import Role, UserRole
+
+from .models import Category, Course, Enrollment, Module
 
 
 class BaseTestClass(TestCase):

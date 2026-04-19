@@ -1,16 +1,9 @@
 from django.contrib import admin
-from .models import (
-    Lesson,
-    Step,
-    TheoryStep,
-    TextInputStep,
-    ChoiceStep,
-    ChoiceOption,
-    ProgrammingStep,
-    TestCase,
-)
-from tinymce.widgets import TinyMCE
 from django.db import models
+from tinymce.widgets import TinyMCE
+
+from .models import (ChoiceOption, ChoiceStep, Lesson, ProgrammingStep, Step,
+                     TestCase, TextInputStep, TheoryStep)
 
 
 class StepInline(admin.TabularInline):
@@ -36,6 +29,8 @@ class StepAdmin(admin.ModelAdmin):
     list_display = ["title", "lesson", "type", "order"]
     list_filter = ["type"]
     search_fields = ["title", "lesson__title"]
+
+    readonly_fields = ["title", "lesson", "type", "order"]
 
 
 @admin.register(Lesson)

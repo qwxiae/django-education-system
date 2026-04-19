@@ -1,10 +1,11 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Category, Course, Enrollment
-from django.views.decorators.http import require_POST
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
-from django.db.models import Count
+from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
+from django.db.models import Count
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
+
+from .models import Category, Course, Enrollment
 
 User = get_user_model()
 

@@ -1,9 +1,11 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from .forms import LoginForm, ProfileForm, RegisterForm, UserForm
-from django.http import HttpRequest, HttpResponse
-from django.contrib.auth import authenticate, login, logout, get_user_model
+from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
+
 from apps.courses.models import Course
+
+from .forms import LoginForm, ProfileForm, RegisterForm, UserForm
 
 User = get_user_model()
 

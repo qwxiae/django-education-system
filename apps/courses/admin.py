@@ -1,7 +1,8 @@
 from django.contrib import admin
-from .models import Category, Course, Module, Enrollment
 from django.db import models
 from tinymce.widgets import TinyMCE
+
+from .models import Category, Course, Enrollment, Module
 
 
 class ModuleInline(admin.TabularInline):

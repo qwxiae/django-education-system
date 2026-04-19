@@ -1,11 +1,8 @@
 from django.contrib import admin
-from .models import (
-    Submission,
-    ChoiceSubmission,
-    TextSubmission,
-    CodeSubmission,
-    TestCaseResult
-)
+
+from .models import (ChoiceSubmission, CodeSubmission, Submission,
+                     TestCaseResult, TextSubmission)
+
 
 @admin.register(Submission)
 class SubmissionAdmin(admin.ModelAdmin):

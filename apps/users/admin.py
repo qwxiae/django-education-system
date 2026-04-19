@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, Profile, Role, UserRole
+
+from .models import Profile, Role, User, UserRole
 
 
 class UserRoleInline(admin.TabularInline):
