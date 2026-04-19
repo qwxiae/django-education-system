@@ -1,44 +1,41 @@
+import logging
+
 import requests
 from celery import shared_task
 from django.conf import settings
-from django.db import transaction
+
+import requests
+from django.conf import settings
 import logging
 
-logging.getLogger()
 
-def execute_with_piston(source_code, stdin="", language="python", version="3.10.0"):
+logger = logging.getLogger()
+
+def execute_code(source_code, stdin="", timeout_ms=5000):
     try:
         response = requests.post(
-            f"{settings.PISTON_URL}/api/v2/execute",
+            f"{settings.EXECUTOR_URL}/execute",
             json={
-                "language": language,
-                "version": version,
-                "files": [{"content": source_code}],
+                "source_code": source_code,
                 "stdin": stdin or "",
-                "run_timeout": 3000,        # 3 sec - how long can code be run inside Piston
-                "compile_timeout": 10000,
-                "run_memory_limit": 128 * 1024 * 1024, # 128MB max
+                "timeout_ms": timeout_ms,
             },
-            timeout=15  # HTTP request timeout; how long to wait for piston to reply
+            timeout=15
         )
-        logging.info("PISTON RAW RESPONSE:", response.text)
         response.raise_for_status()
         data = response.json()
-        run = data.get("run", {})
-
         return {
-            "output": run.get("stdout", ""),
-            "error": run.get("stderr", ""),
-            "runtime_ms": int(float(run.get("cpu_time", 0)) * 1000),
-            "timed_out": run.get("code") == 124,  # 124 = timeout exit code
+            "output":     data.get("stdout", ""),
+            "error":      data.get("stderr", ""),
+            "runtime_ms": data.get("runtime_ms", 0),
+            "timed_out":  data.get("timed_out", False),
         }
-
     except requests.RequestException as e:
         return {
-            "output": "",
-            "error": f"Execution service unavailable: {str(e)}",
+            "output":     "",
+            "error":      f"Execution service unavailable: {str(e)}",
             "runtime_ms": 0,
-            "timed_out": False,
+            "timed_out":  False,
         }
 
 
@@ -60,15 +57,23 @@ def run_code_submission(self, code_submission_id):
         passed = 0
 
         for test_case in test_cases:
-            result = execute_with_piston(
+            result = execute_code(
                 source_code=code_sub.source_code,
                 stdin=test_case.input_data,
+                timeout_ms=prog_step.time_limit_ms,
             )
 
-            # normalize output for comparison
-            actual = result["output"].strip()
+            actual   = result["output"].strip()
             expected = test_case.expected_output.strip()
             is_passed = actual == expected and not result["timed_out"]
+
+            print(f"--- TEST CASE {test_case.order} ---", flush=True)
+            print(f"ACTUAL:   {repr(actual)}", flush=True)
+            print(f"EXPECTED: {repr(expected)}", flush=True)
+            print(f"PASSED:   {is_passed}", flush=True)
+            print(f"ERROR:    {repr(result['error'])}", flush=True)
+            print(f"FULL RESULT: {result}", flush=True)
+            print(f"SOURCE CODE: {repr(code_sub.source_code)}", flush=True)
 
             if is_passed:
                 passed += 1
@@ -77,14 +82,14 @@ def run_code_submission(self, code_submission_id):
                 submission=code_sub,
                 test_case=test_case,
                 defaults={
-                    "passed": is_passed,
+                    "passed":        is_passed,
                     "actual_output": result["output"] or result["error"],
-                    "runtime_ms": result["runtime_ms"],
+                    "runtime_ms":    result["runtime_ms"],
                 }
             )
 
         code_sub.tests_passed = passed
-        code_sub.tests_total = len(test_cases)
+        code_sub.tests_total  = len(test_cases)
         code_sub.save()
 
         submission = code_sub.submission

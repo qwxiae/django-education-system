@@ -1,13 +1,16 @@
-from django.shortcuts import render
-from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
-from django.http import HttpResponse
-from apps.lessons.models import Step, ChoiceStep, TextInputStep, ProgrammingStep
-from .models import Submission, ChoiceSubmission, TextSubmission, CodeSubmission
-from .tasks import run_code_submission
-from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, render
+from django.views.decorators.http import require_POST
+
+from apps.lessons.models import (ChoiceStep, ProgrammingStep, Step,
+                                 TextInputStep)
+
+from .models import (ChoiceSubmission, CodeSubmission, Submission,
+                     TextSubmission)
+from .tasks import run_code_submission
 
 
 @login_required
@@ -93,6 +96,13 @@ def submit_view(request, lesson_id):
         transaction.on_commit(
             lambda: run_code_submission.delay(code_sub.pk)
         )
+
+        if submission.status == Submission.Status.CORRECT:
+            completed_steps = request.session.get("completed_steps", [])
+            if step_id not in completed_steps:
+                completed_steps.apped(step.pk)
+            # store step in session
+            request.session["completed_steps"] = completed_steps
 
         return render(request, "partials/submission_result.html", {
             "pending": True,

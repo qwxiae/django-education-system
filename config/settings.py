@@ -1,7 +1,8 @@
-from pathlib import Path
-from decouple import config
-import sys
 import os
+import sys
+from pathlib import Path
+
+from decouple import config
 
 ENVIRONMENT = config("ENVIRONMENT", default="development")
 
@@ -185,10 +186,12 @@ if not TESTING and DEBUG:
     INSTALLED_APPS = [
         *INSTALLED_APPS,
         "debug_toolbar",
+        "silk",
     ]
     MIDDLEWARE = [
         "debug_toolbar.middleware.DebugToolbarMiddleware",
         *MIDDLEWARE,
+        'silk.middleware.SilkyMiddleware',
     ]
 
 # === Input widget for courses in admin ===
@@ -232,8 +235,8 @@ JAZZMIN_UI_TWEAKS = {
     "sidebar_nav_compact_style": False,
     "sidebar_nav_legacy_style": False,
     "sidebar_nav_flat_style": False,
-    "theme": "pulse",
-    "default_theme_mode": "dark",
+    "theme": "lux",
+    "default_theme_mode": "light",
     "button_classes": {
         "primary": "btn-primary",
         "secondary": "btn-secondary",
@@ -301,3 +304,6 @@ LOGGING = {
 
 # === SANDBOX ===
 PISTON_URL = get_secret("piston_url", "PISTON_URL", default="http://piston:2000")
+
+# === CODE EXECUTOR ===
+EXECUTOR_URL = get_secret("executor_url", "EXECUTOR_URL", default="http://executor:8080")
