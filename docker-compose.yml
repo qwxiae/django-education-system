@@ -7,11 +7,11 @@ services:
     build:
       context: .
       dockerfile: infra/docker/Dockerfile
-    ports: 
-      - "8000:8000"
-    # remove at prod
     volumes: 
       - .:/app 
+      - media_data:/app/media
+      - static_data:/app/staticfiles
+
     depends_on:
       db:
         condition: service_healthy
@@ -82,10 +82,32 @@ services:
     volumes:
       - piston_data:/piston/data
 
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./infra/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - media_data:/media
+      - static_data:/staticfiles
+    depends_on:
+      - web
+  
+  executor:
+    build:
+      context: ./infra/executor
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    restart: always
+    
 volumes:
   piston_data:            
   postgres_data:
   redis_data:
   rabbitmq_data:
+  media_data:
+  static_data:
+
 
       
