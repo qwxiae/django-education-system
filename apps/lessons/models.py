@@ -1,11 +1,12 @@
-from django.db import models
-from apps.courses.models import Module
-from django.urls import reverse
 import random
-import shortuuid
 
 import shortuuid
 from django.db import models
+from django.urls import reverse
+
+from apps.courses.models import Module
+from django.db.models import Max
+
 
 def default_public_id():
     return shortuuid.uuid()
@@ -28,6 +29,14 @@ class Lesson(models.Model):
         unique_together = [("module", "order")]
         ordering = ["order"]
 
+    def save(self, *args, **kwargs):
+        if self.order == 0:
+            max_order = Lesson.objects.filter(
+                module=self.module).aggregate(Max("order"))["order__max"]
+            self.order = (max_order or 0) + 1
+        
+        super().save(*args, **kwargs)
+        
     def get_absolute_url(self):
         return reverse("lessons:lesson", kwargs={"public_id": self.public_id})
 
@@ -44,8 +53,16 @@ class Step(models.Model):
     title = models.CharField(max_length=255)
     lesson = models.ForeignKey(Lesson, related_name="steps", on_delete=models.CASCADE)
     type = models.CharField(default=StepType.THEORY, choices=StepType, max_length=1)
-    order = models.PositiveSmallIntegerField()
+    order = models.PositiveSmallIntegerField(default=0)
 
+    def save(self, *args, **kwargs):
+        if self.order == 0:
+            max_order = Step.objects.filter(
+                lesson=self.lesson).aggregate(Max("order"))["order__max"]
+            self.order = (max_order or 0) + 1
+        
+        super().save(*args, **kwargs)
+    
     class Meta:
         db_table = "lessons_step"
         unique_together = [
@@ -86,8 +103,16 @@ class ChoiceOption(models.Model):
     )
     text = models.TextField()
     is_correct = models.BooleanField(default=False)
-    order = models.PositiveSmallIntegerField()
+    order = models.PositiveSmallIntegerField(default=0)
 
+    def save(self, *args, **kwargs):
+        if self.order == 0:
+            max_order = ChoiceOption.objects.filter(
+                step=self.step).aggregate(Max("order"))["order__max"]
+            self.order = (max_order or 0) + 1
+        
+        super().save(*args, **kwargs)
+    
     class Meta:
         db_table = "lessons_choiceoption"
         unique_together = [
@@ -135,8 +160,16 @@ class TestCase(models.Model):
     )
     input_data = models.TextField(default="", blank=True)
     expected_output = models.TextField()
-    order = models.PositiveSmallIntegerField()
+    order = models.PositiveSmallIntegerField(default=0)
 
+    def save(self, *args, **kwargs):
+        if self.order == 0:
+            max_order = ChoiceOption.objects.filter(
+                step=self.step).aggregate(Max("order"))["order__max"]
+            self.order = (max_order or 0) + 1
+        
+        super().save(*args, **kwargs)
+    
     class Meta:
         db_table = "lessons_testcase"
         unique_together = [("step", "order")]
