@@ -1,6 +1,7 @@
 from django.core.management import BaseCommand
-from apps.courses.models import Category
 from django.utils.text import slugify
+
+from apps.courses.models import Category
 
 
 class Command(BaseCommand):
