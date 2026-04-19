@@ -1,7 +1,8 @@
+from django.contrib.admin.views.decorators import staff_member_required
 from django.core.files.storage import default_storage
 from django.http import JsonResponse
-from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.csrf import csrf_exempt
+
 
 @csrf_exempt
 @staff_member_required

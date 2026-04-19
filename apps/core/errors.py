@@ -1,5 +1,6 @@
 from django.shortcuts import render
 
+
 def error_view(request, exception=None, status=500):
     if status == 404:
         message = "Page not found"
