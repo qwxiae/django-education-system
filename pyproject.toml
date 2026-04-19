@@ -41,7 +41,6 @@ dependencies = [
     "coverage==7.13.4",
     "decorator==5.2.1",
     "django==6.0.2",
-    "django-debug-toolbar==6.2.0",
     "django-extensions==4.1",
     "django-redis==6.0.0",
     "django-stubs[compatible-mypy]==5.2.9",
@@ -83,4 +82,8 @@ dependencies = [
     "django-celery-results>=2.6.0",
     "requests>=2.33.1",
     "shortuuid>=1.0.13",
+    "django-silk[formatting]>=5.5.0",
+    "django-debug-toolbar>=6.3.0",
+    "django-jazzmin>=3.0.4",
+    "django-tinymce>=5.0.0",
 ]

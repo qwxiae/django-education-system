@@ -1,181 +1,158 @@
 # EduPlatform
 ![Django](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white) ![DRF](https://img.shields.io/badge/DRF-ff1709?style=for-the-badge&logo=django&logoColor=white) ![HTMX](https://img.shields.io/badge/HTMX-36C?style=for-the-badge&logo=htmx&logoColor=white) ![CSS](https://img.shields.io/badge/CSS-1572B6?style=for-the-badge&logo=css3&logoColor=white) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white) ![Celery](https://img.shields.io/badge/Celery-37814A?style=for-the-badge&logo=celery&logoColor=white) ![RabbitMQ](https://img.shields.io/badge/RabbitMQ-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white) ![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white) ![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)
 ---
-Онлайн образовательная платформа, которая позволяет инструктору создавать курсы, уроки и интерактивные задания. Инструкторам доступны аналитические данные о прохождении их курса. Ученики могут записывться на курсы, отслеживать прогресс и прозодить задания.
+Онлайн образовательная платформа, которая позволяет инструктору создавать курсы, уроки и интерактивные задания. Инструкторам доступны аналитические данные о прохождении их курса. Ученики могут записывться на курсы, отслеживать прогресс и проходить задания.
 
 ## Preview
 ![demo gif](assets/demo.gif)
-<!-- ![описание](assets/screenshot.png) -->
+
+## Features
+
+**For students:**
+- Поиск и фильтрация каталога по категории и названию
+- Запись на курс и отслеживание прогресса
+- Теоретические задания, задания на выбор и ввод правильного ответа, задания по программированию 
+
+**For instructors:**
+- Полное управление своими курсами - создание и обновление курса, уроков, заданий со встроенным редактором текстовых данных TinyMCE 
+- Аналитическая панель для каждого курса: данные о записи, прохождении и самые неудачные задания
+- Учительская панель со всеми курсами пользователя
+
+**System:**
+- Ролевая система доступа (student, instructor)
+- Асинхронное выполнение кода вместе с celery и изолированным FastAPI микросервисом
+- Redis кэширование
+- Django админ стилизирован с помощью Jazzmin
+- Разворотка с помощью Docker Compose + Nginx
+
+---
 
 ## Tech Stack
 
 | Layer | Technology |
 |---|---|
-| Backend | Django 5, Django REST Framework |
-| Frontend | HTMX, vanilla CSS |
-| Database | PostgreSQL |
-| Async | Celery + RabbitMQ |
-| Cache | Redis |
-| Editor | TinyMCE |
-| Admin | Jazzmin |
-| Deployment | Docker + Nginx |
-
-
-## Features
-
-- **Каталог курсов** — список всех курсов с фильтром по категории и поиском по названию курса
-- **Система записи** — возможность записаться на курс / отписаться с курса с использованием HTMX
-- **Система уроков** — пошаговая навигация по уроку с использованием HTMX partial updates
-- **Типы шагов** — теоретический шаг (текстовый), выбор правильного ответа, ввод данных, задание по программированию
-- **Отслеживание прогресса** — каждая запись на курс ослеживает прогресс пользователя
-- **Пользовательские профили** — публичные профили с аватарками, созданными пользователем курсами и информацией о самом пользователе
-- **Ролевая система** — роли student, instructor, moderator 
+| Backend | Django 5, Gunicorn |
+| Frontend | Django Templates, HTMX, Chart.js, CodeMirror 5 |
+| Database | PostgreSQL 14 |
+| Cache | Redis 7 |
+| Task queue | Celery + RabbitMQ |
+| Code execution | FastAPI microservice (Python 3.11-slim) |
+| Web server | Nginx |
+| Admin | Jazzmin + TinyMCE |
+| Containerisation | Docker, Docker Compose |
 
 ---
 
 ## Project Structure
+
 ```
 education_system/
 ├── apps/
-│   ├── users/          # auth, profiles, roles
-│   ├── courses/        # courses, modules, enrollments
-│   └── lessons/        # lessons, steps, step subtypes
-├── config/             # settings, urls, wsgi
-├── infra/              # nginx, docker configs
-├── static/             # css, js, fonts
-└── templates/          # base, includes, partials
+│   ├── users/          # auth, profiles, roles, signals
+│   ├── courses/        # courses, modules, enrollment, progress
+│   ├── lessons/        # lessons, steps (theory/choice/text/code)
+│   ├── submissions/    # submissions, results, celery tasks
+│   └── core/           # cache keys, shared utilities
+├── config/             # settings, urls, celery, wsgi
+├── infra/
+│   ├── docker/         # Dockerfile (main app)
+│   ├── executor/       # FastAPI code execution microservice
+│   └── nginx/          # nginx.conf
+├── static/             # css, fonts, htmx
+├── templates/          # all Django templates
+├── media/              # user uploads 
+└── docker-compose.yml
 ```
 
----
+## Quick Start
 
-## Local Setup
-
-**Требования:** Python 3.12+, PostgreSQL, Redis, RabbitMQ
+**Requirements:** Docker, Docker Compose
 
 ```bash
-# clone
+# 1. clone
 git clone https://github.com/yourusername/education_system.git
 cd education_system
 
-# virtual environment
-python -m venv .venv
-source .venv/bin/activate      
-# windows: .venv\Scripts\activate
-
-# dependencies
-pip install -r requirements.txt
-
-# environment variables
+# 2. environment
 cp .env.example .env
-# edit .env with your database, redis, rabbitmq credentials
 
-# database
-python manage.py migrate
+# 3. start
+docker-compose up --build
 
-# Optional: seed data
-python manage.py seed_data
+# 4. seed data (optional)
+docker-compose exec web python manage.py seed_lessons
 
-# static files
-python manage.py collectstatic
+# 5. create admin user
+docker-compose exec web python manage.py createsuperuser
 
-# run
-python manage.py runserver
+# 6. open
+http://localhost        # main app via Nginx
+http://localhost/admin/ # admin panel
+```
+
+## Environment Variables
+
+```dotenv
+# Django
+ENVIRONMENT=production
+DEBUG=False
+SECRET_KEY=your-secret-key
+ALLOWED_HOSTS=localhost,127.0.0.1
+
+# PostgreSQL
+POSTGRES_HOST=db
+POSTGRES_DB=eduplatform
+POSTGRES_USER=dbuser
+POSTGRES_PASSWORD=password
+
+# Redis
+REDIS_PASSWORD=redispassword
+REDIS_URL=redis://:redispassword@redis:6379/0
+
+# RabbitMQ
+RABBITMQ_USER=guest
+RABBITMQ_PASSWORD=guest
+RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672//
+
+# Executor microservice
+EXECUTOR_URL=http://executor:8080
 ```
 
 ---
 
-## Seed Data
+## Seed Commands
 
-Команды *seed* идемпотентны: можно запускать несколько раз.   
-В основном используются для тестирования приложения.
+Each command is idempotent — safe to run multiple times.
 
 ```bash
-# student, instructor, moderator
-python manage.py seed_roles       
-# programming, math, cybersecurity
-python manage.py seed_categories  
-# test users
-python manage.py seed_users       
-# courses with modules
-python manage.py seed_courses     
-# lessons and steps for intro-to-python
-python manage.py seed_lessons     
+python manage.py seed_roles        # student, instructor, moderator roles
+python manage.py seed_categories   # programming, math, science...
+python manage.py seed_users        # user accounts
+python manage.py seed_courses      # courses with modules
+python manage.py seed_lessons      # lessons for courses
+python manage.py seed_lessons      # submissions for lessons
 ```
-
----
-
-## Data Model
-
-```
-User ──< UserRole >── Role
-User ──< Enrollment >── Course
-Course ──< Module ──< Lesson ──< Step
-                                  ├── TheoryStep      
-                                  ├── ChoiceStep      
-                                  ├── TextInputStep   
-                                  └── ProgrammingStep
-```
-
-Ключевые решения:  
-- Courses идентифицируются по по слагу: SEO-оптимизированны, стабильны
-- Lessons идентифицируются по общедоступному идентификатору: 9-значное случайное число
-- Steps используется для **конкретного наследования** — у каждого типа, наследующего Steps, своя таблица
-- Прогресс сохраняется в Enrollment в виде количества пройденных уроков, вычисляемого в процентах.
-
----
 
 ## Running Tests
 
 ```bash
 # all tests
-python manage.py test
+docker-compose exec web python manage.py test
 
 # specific app
-python manage.py test apps.courses
-python manage.py test apps.users
+docker-compose exec web python manage.py test apps.courses
+docker-compose exec web python manage.py test apps.users
 
 # with coverage
-coverage run manage.py test
-coverage html
-open htmlcov/index.html
+docker-compose exec web coverage run manage.py test
+docker-compose exec web coverage html
 ```
 
----
 
-## Environment Variables
+## Known Limitations / Future Work
 
-```env
-SECRET_KEY=<your-secret-key-here>
-DEBUG=True
-DATABASE_URL=postgres://user:password@localhost:5432/eduplatform
-REDIS_URL=redis://localhost:6379/0
-RABBITMQ_URL=amqp://guest:guest@localhost:5672/
-MEDIA_ROOT=media/
-```
+- [ ] No OAuth (Google/GitHub login)
+- [ ] No email verification or password reset
+- [ ] Code execution sandbox uses subprocess inside Docker
+- [ ] Only Python supported in programming steps
 
-## Admin Panel
-
-Доступ по адресу `/admin/` — оформление выполнено с иcпользованием Jazzmin.
-
-Для доступа к панели администратора:
-```bash
-python manage.py createsuperuser
-```
-
----
-
-## Docker
-```sh
-docker compose up
-```
-
-Для установки языков программирования в Piston sandbox:
-```sh
-# install Python 3.10
-curl -X POST http://localhost:2000/api/v2/packages \
-  -H "Content-Type: application/json" \
-  -d '{"language": "python", "version": "3.10.0"}'
-
-# verify it installed
-curl http://localhost:2000/api/v2/runtimes
-```

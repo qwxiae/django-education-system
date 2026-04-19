@@ -1,32 +1,9 @@
-:root {
-    --primary: #5360d3;
-}
-
 .sidebar-dark-primary {
-    background-color: #111118 !important; 
+    background-color: #030303 !important; 
 }
 
-.sidebar-dark-primary .nav-sidebar .nav-item .nav-link.active {
-    background-color: #5360d3 !important;
-}
-
-.sidebar-dark-primary .nav-sidebar .nav-link:hover {
-    background-color: #2e2e45 !important;
-}
-
-.navbar-dark.navbar-primary {
-    background-color: #1d1d29 !important;
-    border-bottom: 1px solid #454558;
-}
-
-.brand-link {
-    background-color: #111118 !important;
-    border-bottom: 1px solid #454558 !important;
-}
-
-.brand-link .brand-text {
-    color: #5360d3 !important;
-    font-weight: 800;
+.card-header {
+    background-color: #dbdad5 !important; 
 }
 
 #recent-actions-module {
@@ -37,14 +14,18 @@
     display: none !important;
 }
 
+.breadcrumb-item.active{
+    color: #6d7631;
+    font-weight: bold;
+}
 .btn-success {
-    background-color: #317656;
+    background-color: #429e73;
     border: none;
 }
 
 .btn-secondary {
     border: none;
-    background-color: #5360d3;
+    background-color: #acb47b;
 }
 
 .btn-info {
@@ -54,10 +35,5 @@
 
 .btn-danger {
     border: none;
-    background-color: #763331;
-}
-
-.breadcrumb-item.active {
-    border: none;
-    color: #eeebeb;
+    background-color: #ac4a46;
 }
