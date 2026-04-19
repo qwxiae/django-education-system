@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} — EduPlatform{% endblock %}
+{% block content %}
+<div class="teach-form-layout">
+    <div class="teach-form-header">
+        <a href="{% url 'analytics:lesson_edit' lesson_id=lesson.public_id %}" class="back-link">← {{ lesson.title }}</a>
+        <h1>{{ title }}
+            <span class="step-type-badge">
+                {% if step_type == "T" %}Theory
+                {% elif step_type == "C" %}Choice
+                {% elif step_type == "I" %}Text Input
+                {% elif step_type == "P" %}Programming
+                {% endif %}
+            </span>
+        </h1>
+    </div>
+
+    <form method="POST" class="teach-form-card">
+        {% csrf_token %}
+
+        <!-- common fields -->
+        <div class="form-group">
+            <label for="{{ form.title.id_for_label }}">Step title</label>
+            {{ form.title }}
+            {% if form.title.errors %}<span class="form-error">{{ form.title.errors.0 }}</span>{% endif %}
+        </div>
+
+        {% if step_type == "T" %}
+        <!-- theory -->
+        <div class="form-section-label">Content</div>
+        <div class="form-group">
+            {{ form.html_content }}
+            {% if form.html_content.errors %}<span class="form-error">{{ form.html_content.errors.0 }}</span>{% endif %}
+        </div>
+
+        {% elif step_type == "C" %}
+        <!-- choice -->
+        <div class="form-group">
+            <label>Question</label>
+            {{ form.question_text }}
+        </div>
+        <div class="form-group form-group-check">
+            {{ form.is_multiple }}
+            <label for="{{ form.is_multiple.id_for_label }}">Allow multiple correct answers</label>
+        </div>
+
+        <div class="form-section-label">Options</div>
+        {{ formset.management_form }}
+        {% for option_form in formset %}
+        <div class="option-formset-row">
+            {% if option_form.instance.pk %}{{ option_form.DELETE }}{% endif %}
+            <div class="form-group" style="flex:1">
+                {{ option_form.text }}
+                {% if option_form.text.errors %}<span class="form-error">{{ option_form.text.errors.0 }}</span>{% endif %}
+            </div>
+            <div class="form-group-check">
+                {{ option_form.is_correct }}
+                <label>Correct</label>
+            </div>
+            <div class="form-group" style="width:60px">
+                {{ option_form.order }}
+            </div>
+        </div>
+        {% endfor %}
+
+        {% elif step_type == "I" %}
+        <!-- text input -->
+        <div class="form-group">
+            <label>Question</label>
+            {{ form.question_text }}
+        </div>
+        <div class="form-group">
+            <label for="{{ form.answer.id_for_label }}">Correct answer</label>
+            {{ form.answer }}
+            {% if form.answer.errors %}<span class="form-error">{{ form.answer.errors.0 }}</span>{% endif %}
+        </div>
+
+        {% elif step_type == "P" %}
+        <!-- programming -->
+        <div class="form-group">
+            <label>Question</label>
+            {{ form.question_text }}
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Language</label>
+                {{ form.language }}
+            </div>
+            <div class="form-group">
+                <label>Time limit (ms)</label>
+                {{ form.time_limit_ms }}
+            </div>
+            <div class="form-group">
+                <label>Memory limit (MB)</label>
+                {{ form.memory_limit_mb }}
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Solution template</label>
+            {{ form.solution_template }}
+        </div>
+
+        <div class="form-section-label">Test Cases</div>
+        {{ formset.management_form }}
+        {% for tc_form in formset %}
+        <div class="testcase-formset-row">
+            {% if tc_form.instance.pk %}{{ tc_form.DELETE }}{% endif %}
+            <div class="form-group" style="flex:1">
+                <label>Input</label>
+                {{ tc_form.input_data }}
+            </div>
+            <div class="form-group" style="flex:1">
+                <label>Expected output</label>
+                {{ tc_form.expected_output }}
+            </div>
+            <div class="form-group" style="width:60px">
+                <label>Order</label>
+                {{ tc_form.order }}
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Save</button>
+            <a href="{% url 'analytics:lesson_edit' lesson_id=lesson.public_id %}" class="btn btn-ghost">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+{% block extra_css %}{% include "analytics/_teach_css.html" %}{% endblock %}

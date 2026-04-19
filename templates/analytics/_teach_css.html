@@ -1,0 +1,211 @@
+<style>
+    .teach-form-layout {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .teach-form-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .teach-form-header h1 {
+        margin: 0.25rem 0 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .back-link {
+        font-size: 0.78rem;
+        color: var(--text-dim);
+        text-decoration: none;
+    }
+
+    .back-link:hover { color: var(--text); }
+
+    /* === FORM CARD === */
+    .teach-form-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 1.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-section-label {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--accent);
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .form-section-label:first-child { margin-top: 0; }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        margin-bottom: 1rem;
+    }
+
+    .form-group label {
+        font-size: 0.82rem;
+        color: var(--text-dim);
+        font-weight: 500;
+    }
+
+    .form-group-check {
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 0.75rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+        margin-top: 1.5rem;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 0.75rem;
+    }
+
+    /* === TWO COLUMN === */
+    .teach-two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        align-items: start;
+    }
+
+    /* === MODULE LIST === */
+    .teach-section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+
+    .teach-section-title {
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: var(--text);
+    }
+
+    .module-list {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+    }
+
+    .module-list-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--border-hi);
+    }
+
+    .module-list-item:last-child { border-bottom: none; }
+
+    .module-list-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex: 1;
+    }
+
+    .module-list-order {
+        font-size: 0.7rem;
+        color: var(--text-faint);
+        min-width: 1.2rem;
+    }
+
+    .module-list-title {
+        font-size: 0.88rem;
+        font-weight: 500;
+        color: var(--text);
+    }
+
+    .module-list-count {
+        font-size: 0.75rem;
+        color: var(--text-dim);
+    }
+
+    .empty-hint {
+        padding: 1.25rem;
+        text-align: center;
+        font-size: 0.82rem;
+        color: var(--text-dim);
+    }
+
+    /* === STEP TYPE BUTTONS === */
+    .step-type-btns {
+        display: flex;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+    }
+
+    .step-type-badge {
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        background: var(--accent-glow);
+        color: var(--accent);
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        font-weight: 600;
+    }
+
+    /* === FORMSETS === */
+    .option-formset-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        background: var(--bg-hover);
+        border-radius: var(--radius);
+        margin-bottom: 0.5rem;
+    }
+
+    .testcase-formset-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        background: var(--bg-hover);
+        border-radius: var(--radius);
+        margin-bottom: 0.5rem;
+    }
+
+    /* === COVER PREVIEW === */
+    .cover-preview {
+        width: 100%;
+        max-height: 140px;
+        object-fit: cover;
+        border-radius: var(--radius);
+        margin-top: 0.5rem;
+        border: 1px solid var(--border);
+    }
+
+    /* === SMALL BUTTONS === */
+    .btn-sm {
+        padding: 0.3rem 0.75rem;
+        font-size: 0.78rem;
+    }
+
+    @media (max-width: 768px) {
+        .teach-two-col { grid-template-columns: 1fr; }
+        .form-row { grid-template-columns: 1fr; }
+    }
+</style>

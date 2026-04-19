@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics — {{ course.title }}{% endblock %}
+
+{% block content %}
+
+<div class="analytics-header">
+    <div>
+        <a href="{% url 'analytics:teach_dashboard' %}" class="back-link">← Teaching Dashboard</a>
+        <h1>{{ course.title }}</h1>
+    </div>
+    <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-ghost">View Course</a>
+</div>
+
+<!-- ==== STAT CARDS ==== -->
+<div class="stat-cards">
+    <div class="stat-card">
+        <span class="stat-label">Total Enrolled</span>
+        <span class="stat-value">{{ total_enrolled }}</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Avg Progress</span>
+        <span class="stat-value">{{ avg_progress }}%</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Completed</span>
+        <span class="stat-value">{{ completed }}</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Completion Rate</span>
+        <span class="stat-value">
+            {% if total_enrolled %}
+                {{ completed|floatformat:0 }}%
+            {% else %}
+                {{ completion_rate }}
+            {% endif %}
+        </span>
+    </div>
+</div>
+
+<!-- ==== CHARTS ==== -->
+<div class="charts-grid">
+
+    <!-- line chart -->
+    <div class="chart-card chart-card-wide">
+        <h2 class="chart-title">Enrollments — Last 30 Days</h2>
+        <canvas id="enrollmentsChart"></canvas>
+    </div>
+
+    <!-- doughnut chart -->
+    <div class="chart-card">
+        <h2 class="chart-title">Completion Status</h2>
+        <canvas id="completionChart"></canvas>
+        <div class="doughnut-legend">
+            <span class="legend-dot" style="background:#3dd68c"></span> Completed
+            <span class="legend-dot" style="background:#5360d3"></span> In Progress
+            <span class="legend-dot" style="background:#454558"></span> Not Started
+        </div>
+    </div>
+
+</div>
+
+<!-- ==== FAILED STEPS ==== -->
+{% if failed_steps %}
+<div class="failed-steps-card">
+    <h2 class="chart-title">Most Failed Steps</h2>
+    <table class="failed-steps-table">
+        <thead>
+            <tr>
+                <th>Step</th>
+                <th>Wrong Submissions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for step in failed_steps %}
+            <tr>
+                <td>{{ step.step__title }}</td>
+                <td>
+                    <span class="fail-count">{{ step.fail_count }}</span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+    const accent   = "#5360d3";
+    const success  = "#3dd68c";
+    const border   = "#454558";
+    const textDim  = "#a0a0b8";
+    // ==== LINE CHART ====
+    const labels = {{ chart_labels|safe }};
+    const counts = {{ chart_counts|safe }};
+
+    new Chart(document.getElementById("enrollmentsChart"), {
+        type: "line",
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "Enrollments",
+                data: counts,
+                borderColor: accent,
+                backgroundColor: "rgba(83,96,211,0.1)",
+                borderWidth: 2,
+                pointRadius: 3,
+                fill: true,
+                tension: 0.4,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: {
+                    ticks: {
+                        color: textDim,
+                        maxTicksLimit: 10,
+                        maxRotation: 0,
+                    },
+                    grid: { color: border }
+                },
+                y: {
+                    ticks: { color: textDim, stepSize: 1 },
+                    grid: { color: border },
+                    beginAtZero: true,
+                }
+            }
+        }
+    });
+
+    // ==== DOUGHNUT CHART ====
+    const doughnutData = {{ doughnut_data|safe }};
+
+    new Chart(document.getElementById("completionChart"), {
+        type: "doughnut",
+        data: {
+            labels: ["Completed", "In Progress", "Not Started"],
+            datasets: [{
+                data: doughnutData,
+                backgroundColor: [success, accent, border],
+                borderWidth: 0,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+            },
+            cutout: "65%",
+        }
+    });
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .analytics-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+    }
+
+    .back-link {
+        font-size: 0.78rem;
+        color: var(--text-dim);
+        text-decoration: none;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    .back-link:hover { color: var(--text); }
+
+    .analytics-header h1 { margin: 0; }
+
+    /* ==== STAT CARDS ==== */
+    .stat-cards {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 1.25rem 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+
+    .stat-label {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-dim);
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--text);
+        font-family: var(--font-head);
+        line-height: 1;
+    }
+
+    /* ==== CHARTS ==== */
+    .charts-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .chart-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+    }
+
+    .chart-title {
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--text-dim);
+        margin: 0 0 1.25rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+
+    .doughnut-legend {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        font-size: 0.8rem;
+        color: var(--text-dim);
+    }
+
+    .legend-dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-right: 0.4rem;
+    }
+
+    /* ==== FAILED STEPS ==== */
+    .failed-steps-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+    }
+
+    .failed-steps-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.88rem;
+    }
+
+    .failed-steps-table th {
+        text-align: left;
+        padding: 0.5rem 0.75rem;
+        color: var(--text-dim);
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .failed-steps-table td {
+        padding: 0.65rem 0.75rem;
+        color: var(--text);
+        border-bottom: 1px solid var(--border-hi);
+    }
+
+    .failed-steps-table tr:last-child td { border-bottom: none; }
+
+    .fail-count {
+        display: inline-block;
+        background: rgba(240,91,91,0.12);
+        color: var(--danger);
+        border-radius: 4px;
+        padding: 0.1rem 0.5rem;
+        font-weight: 600;
+        font-size: 0.82rem;
+    }
+
+    @media (max-width: 900px) {
+        .stat-cards { grid-template-columns: repeat(2, 1fr); }
+        .charts-grid { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}

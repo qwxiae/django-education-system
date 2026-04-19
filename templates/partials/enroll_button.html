@@ -1,17 +1,13 @@
 {% if user.is_authenticated %}
     {% if is_enrolled %}
-        <form hx-post="{% url 'courses:unenroll' slug=course.slug %}"
-              hx-target="#enroll-section"
-              hx-swap="innerHTML">
+        <form method="POST" action="{% url 'courses:unenroll' slug=course.slug %}">
             {% csrf_token %}
             <button class="btn btn-ghost" style="width:100%">
                 ✓ Enrolled — Unenroll
             </button>
         </form>
     {% else %}
-        <form hx-post="{% url 'courses:enroll' slug=course.slug %}"
-              hx-target="#enroll-section"
-              hx-swap="innerHTML">
+        <form method="POST" action="{% url 'courses:enroll' slug=course.slug %}">
             {% csrf_token %}
             <button class="btn btn-primary" style="width:100%">
                 Enroll

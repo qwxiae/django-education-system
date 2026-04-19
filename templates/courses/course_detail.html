@@ -86,7 +86,6 @@
     <!-- RIGHT: ENROLL CARD -->
     <aside class="course-sidebar">
         <div class="enroll-card">
-
             {% if course.cover %}
             <img src="{{ course.cover.url }}"
                  alt="{{ course.title }}"
@@ -98,6 +97,12 @@
             {% endif %}
 
             <div class="enroll-card-body">
+                {% if request.user == course.author %}
+                <a href="{% url 'analytics:course_analytics' course.slug %}"
+                class="btn btn-ghost" style="width:100%; text-align:center; margin-top:0.5rem;">
+                    View Analytics
+                </a>
+                {% endif %}
                 <div id="enroll-section">
                     {% include "partials/enroll_button.html" %}
                 </div>

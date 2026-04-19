@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Edit {{ module.title }} — EduPlatform{% endblock %}
+{% block content %}
+<div class="teach-form-layout">
+    <div class="teach-form-header">
+        <a href="{% url 'analytics:course_edit' slug=course.slug %}" class="back-link">← {{ course.title }}</a>
+        <h1>{{ module.title }}</h1>
+    </div>
+
+    <div class="teach-two-col">
+
+        <!-- LEFT: module form -->
+        <div>
+            <form method="POST" class="teach-form-card">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>Module title</label>
+                    {{ form.title }}
+                    {% if form.title.errors %}<span class="form-error">{{ form.title.errors.0 }}</span>{% endif %}
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-primary" type="submit">Save changes</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- RIGHT: lessons -->
+        <div>
+            <div class="teach-section-header">
+                <span class="teach-section-title">Lessons</span>
+                <a href="{% url 'analytics:lesson_create' slug=course.slug module_id=module.pk %}"
+                   class="btn btn-primary btn-sm">+ Add Lesson</a>
+            </div>
+
+            <div class="module-list">
+                {% for lesson in lessons %}
+                <div class="module-list-item">
+                    <div class="module-list-meta">
+                        <span class="module-list-order">{{ forloop.counter }}</span>
+                        <span class="module-list-title">{{ lesson.title }}</span>
+                        {% if not lesson.is_published %}
+                            <span class="badge">Draft</span>
+                        {% endif %}
+                    </div>
+                    <a href="{% url 'analytics:lesson_edit' lesson_id=lesson.public_id %}"
+                       class="btn btn-ghost btn-sm">Edit</a>
+                </div>
+                {% empty %}
+                <p class="empty-hint">No lessons yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+{% block extra_css %}{% include "analytics/_teach_css.html" %}{% endblock %}

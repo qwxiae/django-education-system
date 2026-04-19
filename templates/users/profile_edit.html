@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block title %}Edit Profile — EduPlatform{% endblock %}
 
 {% block content %}
@@ -14,16 +14,18 @@
 
         <div class="avatar-section">
             <label for="{{ profile_form.avatar.id_for_label }}" class="avatar-trigger" title="Click to change avatar">
-                {% if request.user.profile.avatar %}
-                    <img src="{{ request.user.profile.avatar.url }}"
-                         alt="Avatar"
-                         class="avatar-preview"
-                         id="avatar-preview-img">
+
+                <img 
+                {% if profile_user.profile.avatar %}
+                     src="{{ request.user.profile.avatar.url }}"
                 {% else %}
-                    <div class="avatar-preview avatar-placeholder" id="avatar-preview-img">
-                        <span>{{ request.user.username|slice:":2"|upper }}</span>
-                    </div>
+                     src="{% static 'img/avatar.png' %}"
                 {% endif %}
+                     alt="Avatar"
+                     class="avatar-preview"
+                     id="avatar-preview-img">
+
+
                 <div class="avatar-overlay">
                     <span>Change</span>
                 </div>
@@ -167,19 +169,6 @@
         transition: filter 0.2s;
     }
 
-    .avatar-placeholder {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, var(--accent-dim), var(--bg-hover));
-    }
-
-    .avatar-placeholder span {
-        font-family: var(--font-head);
-        font-size: 1.6rem;
-        font-weight: 800;
-        color: rgba(255,255,255,0.4);
-    }
 
     /* overlay shown on hover */
     .avatar-overlay {

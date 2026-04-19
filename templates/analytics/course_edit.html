@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Edit {{ course.title }} — EduPlatform{% endblock %}
+{% block content %}
+<div class="teach-form-layout">
+
+    <div class="teach-form-header">
+        <a href="{% url 'analytics:teach_dashboard' %}" class="back-link">← Teaching Dashboard</a>
+        <h1>{{ course.title }}</h1>
+    </div>
+
+    <div class="teach-two-col">
+
+        <!-- LEFT: course form -->
+        <div>
+            <form method="POST" enctype="multipart/form-data" class="teach-form-card">
+                {% csrf_token %}
+
+                <div class="form-section-label">Course Info</div>
+                <div class="form-group">
+                    <label>Title</label>
+                    {{ form.title }}
+                    {% if form.title.errors %}<span class="form-error">{{ form.title.errors.0 }}</span>{% endif %}
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    {{ form.category }}
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    {{ form.description }}
+                </div>
+
+                <div class="form-section-label">Promo Content</div>
+                <div class="form-group">{{ form.promo_content }}</div>
+
+                <div class="form-section-label">Cover & Publishing</div>
+                <div class="form-group">
+                    <label>Cover image</label>
+                    {{ form.cover }}
+                    {% if course.cover %}
+                        <img src="{{ course.cover.url }}" class="cover-preview">
+                    {% endif %}
+                </div>
+                <div class="form-group form-group-check">
+                    {{ form.is_published }}
+                    <label for="{{ form.is_published.id_for_label }}">Published</label>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn btn-primary" type="submit">Save changes</button>
+                    <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-ghost">Preview</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- RIGHT: modules -->
+        <div>
+            <div class="teach-section-header">
+                <span class="teach-section-title">Modules</span>
+                <a href="{% url 'analytics:module_create' slug=course.slug %}"
+                   class="btn btn-primary btn-sm">+ Add Module</a>
+            </div>
+
+            <div class="module-list">
+                {% for module in modules %}
+                <div class="module-list-item">
+                    <div class="module-list-meta">
+                        <span class="module-list-order">{{ forloop.counter }}</span>
+                        <span class="module-list-title">{{ module.title }}</span>
+                        <span class="module-list-count">{{ module.lessons.count }} lessons</span>
+                    </div>
+                    <a href="{% url 'analytics:module_edit' slug=course.slug module_id=module.pk %}"
+                       class="btn btn-ghost btn-sm">Edit</a>
+                </div>
+                {% empty %}
+                <p class="empty-hint">No modules yet. Add one to get started.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+{% block extra_css %}{% include "analytics/_teach_css.html" %}{% endblock %}

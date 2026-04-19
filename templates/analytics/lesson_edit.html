@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Edit {{ lesson.title }} — EduPlatform{% endblock %}
+{% block content %}
+<div class="teach-form-layout">
+    <div class="teach-form-header">
+        <a href="{% url 'analytics:module_edit' slug=course.slug module_id=lesson.module.pk %}" class="back-link">← {{ lesson.module.title }}</a>
+        <h1>{{ lesson.title }}</h1>
+    </div>
+
+    <div class="teach-two-col">
+
+        <!-- LEFT: lesson form -->
+        <div>
+            <form method="POST" class="teach-form-card">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>Lesson title</label>
+                    {{ form.title }}
+                    {% if form.title.errors %}<span class="form-error">{{ form.title.errors.0 }}</span>{% endif %}
+                </div>
+                <div class="form-group form-group-check">
+                    {{ form.is_published }}
+                    <label for="{{ form.is_published.id_for_label }}">Published</label>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-primary" type="submit">Save changes</button>
+                    <a href="{% url 'lessons:lesson' lesson_id=lesson.public_id %}" class="btn btn-ghost">Preview</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- RIGHT: steps -->
+        <div>
+            <div class="teach-section-header">
+                <span class="teach-section-title">Steps</span>
+                <div class="step-type-btns">
+                    <a href="{% url 'analytics:step_create' lesson_id=lesson.public_id %}?type=T" class="btn btn-ghost btn-sm">+ Theory</a>
+                    <a href="{% url 'analytics:step_create' lesson_id=lesson.public_id %}?type=C" class="btn btn-ghost btn-sm">+ Choice</a>
+                    <a href="{% url 'analytics:step_create' lesson_id=lesson.public_id %}?type=I" class="btn btn-ghost btn-sm">+ Text Input</a>
+                    <a href="{% url 'analytics:step_create' lesson_id=lesson.public_id %}?type=P" class="btn btn-ghost btn-sm">+ Code</a>
+                </div>
+            </div>
+
+            <div class="module-list">
+                {% for step in steps %}
+                <div class="module-list-item">
+                    <div class="module-list-meta">
+                        <span class="module-list-order">{{ step.order }}</span>
+                        <span class="module-list-title">{{ step.title }}</span>
+                        <span class="badge">{{ step.get_type_display }}</span>
+                    </div>
+                    <a href="{% url 'analytics:step_edit' step_id=step.pk %}"
+                       class="btn btn-ghost btn-sm">Edit</a>
+                </div>
+                {% empty %}
+                <p class="empty-hint">No steps yet. Add one above.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+{% block extra_css %}{% include "analytics/_teach_css.html" %}{% endblock %}

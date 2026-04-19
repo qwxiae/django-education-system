@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Teaching Dashboard — EduPlatform{% endblock %}
+
+{% block content %}
+<div class="teach-header">
+    <h1>Your Courses</h1>
+    <a href="{% url 'analytics:course_create' %}" class="btn btn-primary">+ New Course</a>
+</div>
+
+<div class="teach-grid">
+    {% for course in courses %}
+    <div class="teach-card">
+        <div class="teach-card-header">
+            {% if course.cover %}
+                <img src="{{ course.cover.url }}" alt="{{ course.title }}" class="teach-card-cover">
+            {% else %}
+                <div class="teach-card-cover teach-card-cover-placeholder">
+                    <span>{{ course.title|slice:":2"|upper }}</span>
+                </div>
+            {% endif %}
+        </div>
+        <div class="teach-card-body">
+            <div class="teach-card-meta">
+                {% if course.is_published %}
+                    <span class="badge badge-success">Published</span>
+                {% else %}
+                    <span class="badge">Draft</span>
+                {% endif %}
+                {% if course.category %}
+                    <span class="badge badge-accent">{{ course.category.name }}</span>
+                {% endif %}
+            </div>
+            <h2 class="teach-card-title">{{ course.title }}</h2>
+            <div class="teach-card-stats">
+                <span>{{ course.enrollment_count }} enrolled</span>
+                <span>{{ course.avg_progress|default:0|floatformat:0 }}% avg progress</span>
+            </div>
+        </div>
+        <div class="teach-card-actions">
+            <a href="{% url 'analytics:course_edit' course.slug  %}" class="btn btn-ghost">Edit</a>
+            <a href="{% url 'analytics:course_analytics' course.slug %}" class="btn btn-primary">Info</a>
+            <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-ghost">View</a>
+        </div>
+    </div>
+    {% empty %}
+    <p class="empty-state">You haven't created any courses yet.</p>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .teach-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .teach-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.25rem;
+    }
+
+    .teach-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .teach-card-cover {
+        width: 100%;
+        aspect-ratio: 16/9;
+        object-fit: cover;
+    }
+
+    .teach-card-cover-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--accent-dim), var(--bg-hover));
+    }
+
+    .teach-card-cover-placeholder span {
+        font-family: var(--font-head);
+        font-size: 2rem;
+        font-weight: 800;
+        color: rgba(255,255,255,0.2);
+    }
+
+    .teach-card-body {
+        padding: 1rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .teach-card-meta {
+        display: flex;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+    }
+
+    .teach-card-title {
+        font-size: 1rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .teach-card-stats {
+        display: flex;
+        gap: 1rem;
+        font-size: 0.78rem;
+        color: var(--text-dim);
+        margin-top: auto;
+        padding-top: 0.5rem;
+    }
+
+    .teach-card-actions {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        border-top: 1px solid var(--border);
+    }
+</style>
+{% endblock %}
