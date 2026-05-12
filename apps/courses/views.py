@@ -1,9 +1,10 @@
+from . import services
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.core.cache import cache
-from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
+from django.db.models import Count
+from django.http import Http404
 
 from .models import Category, Course, Enrollment
 
@@ -11,11 +12,7 @@ User = get_user_model()
 
 
 def home_view(request):
-    featured_courses = (
-        Course.objects.filter(is_published=True)
-        .select_related("category", "author")
-        .order_by("-created_at")[:6]
-    )
+    featured_courses = services.get_featured_courses()
 
     return render(
         request,
@@ -26,27 +23,13 @@ def home_view(request):
         },
     )
 
-
-def about_view(request):
-    """Information about the site"""
-    return render(request, "courses/about.html")
-
-
 def catalog_view(request):
-    categories = cache.get("categories")
-    categories = Category.objects.all()
-    courses = Course.objects.select_related("category", "author").filter(
-        is_published=True
-    )
+    categories = services.get_categories()
 
     category_slug = request.GET.get("category")
-    # search if provided
     q = request.GET.get("q")
 
-    if category_slug:
-        courses = courses.filter(category__slug=category_slug)
-    if q:
-        courses = courses.filter(title__icontains=q)
+    courses = services.get_published_courses(category_slug=category_slug, q=q)
 
     return render(
         request,
@@ -61,14 +44,10 @@ def catalog_view(request):
 
 
 def course_detail_view(request, slug: str):
-    course = get_object_or_404(
-        Course.objects.select_related("author", "category").annotate(
-            module_count=Count("modules")
-        ),
-        slug=slug,
-        is_published=True,
-    )
+    course = services.get_course_detail(slug=slug)
 
+    if course is None:
+        raise Http404
     modules = (
         course.modules.prefetch_related("lessons")
         .annotate(lesson_count=Count("lessons"))
@@ -127,8 +106,10 @@ def unenroll_view(request, slug: str):
 
 @login_required
 def my_courses_view(request):
-    enrollments = Enrollment.objects.filter(user=request.user).select_related(
-        "course", "course__category", "course__author"
-    )
-
+    enrollments = (
+            Enrollment.objects
+            .filter(user=request.user)
+            .select_related("course", "course__category", "course__author")
+        )
+    
     return render(request, "courses/my_courses.html", {"enrollments": enrollments})
