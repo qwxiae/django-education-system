@@ -186,12 +186,10 @@ if not TESTING and DEBUG:
     INSTALLED_APPS = [
         *INSTALLED_APPS,
         "debug_toolbar",
-        "silk",
     ]
     MIDDLEWARE = [
         "debug_toolbar.middleware.DebugToolbarMiddleware",
         *MIDDLEWARE,
-        'silk.middleware.SilkyMiddleware',
     ]
 
 # === Input widget for courses in admin ===
@@ -301,9 +299,6 @@ LOGGING = {
         },
     },
 }
-
-# === SANDBOX ===
-PISTON_URL = get_secret("piston_url", "PISTON_URL", default="http://piston:2000")
 
 # === CODE EXECUTOR ===
 EXECUTOR_URL = get_secret("executor_url", "EXECUTOR_URL", default="http://executor:8080")

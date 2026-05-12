@@ -106,7 +106,7 @@ class Command(BaseCommand):
                             defaults={"input_data": "", "expected_output": "Hello, World!"}
                         )
 
-        self.stdout.write(self.style.SUCCESS("\n✅ Done seeding ALL lessons"))
+        self.stdout.write(self.style.SUCCESS("\nDone seeding ALL lessons"))
 
 
         if created:

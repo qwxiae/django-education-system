@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
-
+from django.utils.functional import cached_property
 
 class UserManager(BaseUserManager):
     """Logging using email."""
@@ -38,17 +38,13 @@ class User(AbstractUser):
         return self.user_roles.filter(role__name=role_name).exists()
 
     # Properties are needed since methods cannot be used in templates
-    @property
+    @cached_property
     def is_student(self) -> bool:
         return self.has_role("student")
 
-    @property
+    @cached_property
     def is_instructor(self) -> bool:
         return self.has_role("instructor")
-
-    @property
-    def is_moderator(self) -> bool:
-        return self.has_role("moderator")
 
     class Meta:
         db_table = "users_user"
