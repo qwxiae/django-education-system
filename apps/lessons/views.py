@@ -1,7 +1,9 @@
 from django.shortcuts import get_object_or_404, render
 
-from .models import (ChoiceStep, Lesson, ProgrammingStep, Step, TextInputStep,
-                     TheoryStep)
+from .models import (
+    ChoiceStep, Lesson, ProgrammingStep,
+    Step, TextInputStep, TheoryStep
+)
 
 
 def lesson_view(request, lesson_id):

@@ -1,7 +1,6 @@
 amqp==5.3.1
 asgiref==3.11.1
 asttokens==3.0.1
-autopep8==2.3.2
 billiard==4.2.4
 celery==5.6.2
 certifi==2026.2.25
@@ -21,15 +20,11 @@ django-debug-toolbar==6.3.0
 django-extensions==4.1
 django-jazzmin==3.0.4
 django-redis==6.0.0
-django-silk==5.5.0
 django-stubs==5.2.9
 django-stubs-ext==5.2.9
 django-tinymce==5.0.0
-djangorestframework==3.16.1
-djangorestframework-stubs==3.16.8
 executing==2.2.1
 filelock==3.25.1
-gprof2dot==2025.4.14
 gunicorn==25.1.0
 identify==2.6.17
 idna==3.11
@@ -52,7 +47,6 @@ pre-commit==4.5.1
 prompt-toolkit==3.0.52
 psycopg2-binary==2.9.11
 pure-eval==0.2.3
-pycodestyle==2.14.0
 pygments==2.19.2
 python-dateutil==2.9.0.post0
 python-decouple==3.8

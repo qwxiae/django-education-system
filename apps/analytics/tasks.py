@@ -1,1 +1,1 @@
-# Celery: aggregate stats, update Redis 
+# Celery: aggregate stats, update Redis

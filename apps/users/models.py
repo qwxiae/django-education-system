@@ -95,27 +95,3 @@ class UserRole(models.Model):
         # prevents duplicate assignments
         unique_together = [("user", "role")]
 
-
-# class OAuthConnection(models.Model):
-#     PROVIDER_CHOICES = [
-#         ("google", "Google"),
-#         ("github", "GitHub"),
-#     ]
-
-#     user = models.ForeignKey(
-#         User,
-#         on_delete=models.CASCADE,
-#         related_name="oauth_connections",
-#     )
-
-#     provider = models.CharField(max_length=20, choices=PROVIDER_CHOICES)
-#     provider_user_id = models.CharField(max_length=255)
-#     provider_email = models.EmailField(blank=True, default="")
-#     connected_at = models.DateTimeField(auto_now_add=True)
-
-#     class Meta:
-#         db_table = "users_oauthconnection"
-#         unique_together = [("user", "provider")]
-
-#     def __str__(self):
-#         return f"{self.user.email} via {self.provider}"
