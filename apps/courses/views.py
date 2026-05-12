@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.http import Http404
 
 from .models import Category, Course, Enrollment
@@ -110,6 +110,15 @@ def my_courses_view(request):
             Enrollment.objects
             .filter(user=request.user)
             .select_related("course", "course__category", "course__author")
+            .annotate(
+                total_exercises=Count(
+                    "course__modules__lessons__steps",
+                    filter=Q(course__modules__lessons__steps__type__in=["C", "I", "P"])
+                )
+            )
+            .order_by("-enrolled_at")
         )
     
+    
+
     return render(request, "courses/my_courses.html", {"enrollments": enrollments})

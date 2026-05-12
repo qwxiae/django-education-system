@@ -39,17 +39,18 @@
                 </a>
 
                 <!-- Progress -->
+                {% with pct=enrollment.total_exercises %}                         
                 <div class="my-course-progress">
                     <div class="progress-header">
                         <span class="progress-label">Progress</span>
-                        <!-- TODO: replace 0 with actual completion percentage -->
-                        <span class="progress-value">{{ enrollment.progress_percentage }}%</span>
+                        <span class="progress-value">{{ pct }}%</span>
                     </div>
                     <div class="progress">
-                        <div class="progress-fill" style="width: {{ enrollment.progress_percentage }}%"></div>
+                        <div class="progress-fill" style="width: {{ pct }}%"></div>
                     </div>
+                
                 </div>
-
+                {% endwith %}
                 <!-- Actions -->
                 <div class="my-course-actions">
                     <a href="{{ enrollment.course.get_absolute_url }}"

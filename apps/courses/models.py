@@ -121,19 +121,6 @@ class Enrollment(models.Model):
     last_active_at = models.DateTimeField(auto_now=True)
     progress = models.PositiveSmallIntegerField(default=0)
 
-    @property
-    def progress_percentage(self):
-        from apps.lessons.models import Step
-
-        total = Step.objects.filter(
-            lesson__module__course=self.course,
-            type__in=["C", "I", "P"]
-        ).count()
-
-        if total == 0:
-            return 0
-        return min(round(self.progress / total * 100), 100)
-    
 
     class Meta:
         db_table = "courses_enrollment"
