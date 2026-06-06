@@ -22,6 +22,7 @@ if settings.DEBUG:
 
 if not settings.TESTING and settings.DEBUG:
     from debug_toolbar.toolbar import debug_toolbar_urls
+
     urlpatterns += debug_toolbar_urls()
 
 if not settings.DEBUG:

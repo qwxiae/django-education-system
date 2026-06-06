@@ -2,14 +2,15 @@ import random
 
 import shortuuid
 from django.db import models
+from django.db.models import Max
 from django.urls import reverse
 
 from apps.courses.models import Module
-from django.db.models import Max
 
 
 def default_public_id():
     return shortuuid.uuid()
+
 
 class Lesson(models.Model):
     module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name="lessons")
@@ -31,17 +32,19 @@ class Lesson(models.Model):
 
     def save(self, *args, **kwargs):
         if self.order == 0:
-            max_order = Lesson.objects.filter(
-                module=self.module).aggregate(Max("order"))["order__max"]
+            max_order = Lesson.objects.filter(module=self.module).aggregate(
+                Max("order")
+            )["order__max"]
             self.order = (max_order or 0) + 1
-        
+
         super().save(*args, **kwargs)
-        
+
     def get_absolute_url(self):
         return reverse("lessons:lesson", kwargs={"public_id": self.public_id})
 
     def __str__(self):
         return f"Lesson(module={self.module.title}, title={self.title})"
+
 
 class Step(models.Model):
     class StepType(models.TextChoices):
@@ -57,12 +60,13 @@ class Step(models.Model):
 
     def save(self, *args, **kwargs):
         if self.order == 0:
-            max_order = Step.objects.filter(
-                lesson=self.lesson).aggregate(Max("order"))["order__max"]
+            max_order = Step.objects.filter(lesson=self.lesson).aggregate(Max("order"))[
+                "order__max"
+            ]
             self.order = (max_order or 0) + 1
-        
+
         super().save(*args, **kwargs)
-    
+
     class Meta:
         db_table = "lessons_step"
         unique_together = [
@@ -107,12 +111,13 @@ class ChoiceOption(models.Model):
 
     def save(self, *args, **kwargs):
         if self.order == 0:
-            max_order = ChoiceOption.objects.filter(
-                step=self.step).aggregate(Max("order"))["order__max"]
+            max_order = ChoiceOption.objects.filter(step=self.step).aggregate(
+                Max("order")
+            )["order__max"]
             self.order = (max_order or 0) + 1
-        
+
         super().save(*args, **kwargs)
-    
+
     class Meta:
         db_table = "lessons_choiceoption"
         unique_together = [
@@ -164,12 +169,13 @@ class TestCase(models.Model):
 
     def save(self, *args, **kwargs):
         if self.order == 0:
-            max_order = ChoiceOption.objects.filter(
-                step=self.step).aggregate(Max("order"))["order__max"]
+            max_order = ChoiceOption.objects.filter(step=self.step).aggregate(
+                Max("order")
+            )["order__max"]
             self.order = (max_order or 0) + 1
-        
+
         super().save(*args, **kwargs)
-    
+
     class Meta:
         db_table = "lessons_testcase"
         unique_together = [("step", "order")]

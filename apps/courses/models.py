@@ -2,7 +2,6 @@ import uuid
 
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.db.models import Count
 from django.urls import reverse
 from django.utils.text import slugify
 
@@ -36,11 +35,10 @@ class Category(models.Model):
 class Course(models.Model):
     """Course that stores modules"""
 
-    # Keep the course even if author is gone
+    # keep the course even if author is gone
     author = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, related_name="courses"
     )
-    # Author can assign another one.
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
@@ -52,8 +50,6 @@ class Course(models.Model):
     title = models.CharField(max_length=255, blank=False)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
     is_published = models.BooleanField(default=False)
-
-    # Textfields dont need max length
     description = models.TextField(blank=False, default="")
 
     promo_content = models.TextField(default="", blank=True)
@@ -95,7 +91,7 @@ class Module(models.Model):
     class Meta:
         db_table = "courses_module"
         unique_together = [("course", "order")]
-        # Always return in order by default
+        # always return in order by default
         ordering = ["order"]
 
     def __str__(self):
@@ -104,12 +100,16 @@ class Module(models.Model):
     def save(self, *args, **kwargs):
         # only on creation
         if not self.pk and not self.order:
-            last = Module.objects.filter(course=self.course).aggregate(
-                max_order=models.Max("order")
-            )["max_order"] or 0
+            last = (
+                Module.objects.filter(course=self.course).aggregate(
+                    max_order=models.Max("order")
+                )["max_order"]
+                or 0
+            )
             self.order = last + 1
         super().save(*args, **kwargs)
-        
+
+
 class Enrollment(models.Model):
     """Connect user to course"""
 
@@ -120,7 +120,6 @@ class Enrollment(models.Model):
     enrolled_at = models.DateTimeField(auto_now_add=True)
     last_active_at = models.DateTimeField(auto_now=True)
     progress = models.PositiveSmallIntegerField(default=0)
-
 
     class Meta:
         db_table = "courses_enrollment"

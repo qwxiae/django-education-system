@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('lessons', '0004_alter_lesson_public_id'),
+        ("lessons", "0004_alter_lesson_public_id"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='step',
-            name='order',
+            model_name="step",
+            name="order",
             field=models.PositiveSmallIntegerField(default=0),
         ),
     ]

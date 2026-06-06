@@ -7,7 +7,6 @@ app_name = "courses"
 urlpatterns = [
     path("", views.home_view, name="home"),
     # === Catalog ===
-    # search and list all courses
     path("catalog/", views.catalog_view, name="catalog"),
     # === Courses ====
     path("courses/<slug:slug>/", views.course_detail_view, name="course_detail"),

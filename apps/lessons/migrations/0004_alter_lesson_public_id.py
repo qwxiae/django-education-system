@@ -6,15 +6,20 @@ import apps.lessons.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('lessons', '0003_alter_testcase_input_data'),
+        ("lessons", "0003_alter_testcase_input_data"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='lesson',
-            name='public_id',
-            field=models.CharField(db_index=True, default=apps.lessons.models.default_public_id, editable=False, max_length=22, unique=True),
+            model_name="lesson",
+            name="public_id",
+            field=models.CharField(
+                db_index=True,
+                default=apps.lessons.models.default_public_id,
+                editable=False,
+                max_length=22,
+                unique=True,
+            ),
         ),
     ]

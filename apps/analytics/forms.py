@@ -3,9 +3,15 @@ from django.forms import inlineformset_factory
 from tinymce.widgets import TinyMCE
 
 from apps.courses.models import Course, Module
-from apps.lessons.models import (ChoiceOption, ChoiceStep, Lesson,
-                                 ProgrammingStep, TestCase, TextInputStep,
-                                 TheoryStep)
+from apps.lessons.models import (
+    ChoiceOption,
+    ChoiceStep,
+    Lesson,
+    ProgrammingStep,
+    TestCase,
+    TextInputStep,
+    TheoryStep,
+)
 
 
 class CourseForm(forms.ModelForm):
@@ -17,30 +23,32 @@ class CourseForm(forms.ModelForm):
             "description",
             "promo_content",
             "cover",
-            "is_published"
+            "is_published",
         ]
         widgets = {
             "description": forms.Textarea(attrs={"rows": 4}),
-            "promo_content": TinyMCE()
+            "promo_content": TinyMCE(),
         }
+
 
 class ModuleForm(forms.ModelForm):
     class Meta:
         model = Module
         fields = ["title"]
 
+
 class LessonForm(forms.ModelForm):
     class Meta:
         model = Lesson
         fields = ["title", "is_published"]
 
+
 class TheoryStepForm(forms.ModelForm):
     class Meta:
         model = TheoryStep
         fields = ["title", "html_content"]
-        widgets = {
-            "html_content": TinyMCE()
-        }
+        widgets = {"html_content": TinyMCE()}
+
 
 class ChoiceStepForm(forms.ModelForm):
     class Meta:
@@ -50,10 +58,12 @@ class ChoiceStepForm(forms.ModelForm):
             "question_text": forms.Textarea(attrs={"rows": 3}),
         }
 
+
 class ChoiceOptionForm(forms.ModelForm):
     class Meta:
         model = ChoiceOption
         fields = ["text", "is_correct", "order"]
+
 
 ChoiceOptionFormSet = inlineformset_factory(
     ChoiceStep,
@@ -63,26 +73,32 @@ ChoiceOptionFormSet = inlineformset_factory(
     can_delete=True,
 )
 
+
 class TextInputStepForm(forms.ModelForm):
     class Meta:
         model = TextInputStep
         fields = ["title", "question_text", "answer"]
-        widgets = {
-            "question_text": forms.Textarea(attrs={"rows": 3})
-        }
+        widgets = {"question_text": forms.Textarea(attrs={"rows": 3})}
+
 
 class ProgrammingStepForm(forms.ModelForm):
     class Meta:
         model = ProgrammingStep
         fields = [
-            "title", "question_text", "language",
-            "time_limit_ms", "memory_limit_mb", "solution_template"
+            "title",
+            "question_text",
+            "language",
+            "time_limit_ms",
+            "memory_limit_mb",
+            "solution_template",
         ]
         widgets = {
             "question_text": forms.Textarea(attrs={"rows": 3}),
-            "solution_template": forms.Textarea(attrs={
-                "rows": 8, "class": "code-editor"})
+            "solution_template": forms.Textarea(
+                attrs={"rows": 8, "class": "code-editor"}
+            ),
         }
+
 
 TestCaseFormSet = inlineformset_factory(
     ProgrammingStep,

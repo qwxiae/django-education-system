@@ -26,10 +26,7 @@ class RegisterForm(UserCreationForm):
 
 
 class LoginForm(forms.Form):
-    """
-    Not a ModelForm - you are not creating/editing a model
-    but collecting credentials
-    """
+    """Form used in login."""
 
     email = forms.EmailField(
         widget=forms.EmailInput(attrs={"placeholder": "you@example.com"})
@@ -40,6 +37,8 @@ class LoginForm(forms.Form):
 
 
 class ProfileForm(forms.ModelForm):
+    """Form for editing profiles."""
+
     # gets rid of checkbox; custom image upload in templates
     avatar = forms.ImageField(required=False, widget=forms.FileInput())
 

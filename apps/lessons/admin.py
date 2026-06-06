@@ -2,8 +2,16 @@ from django.contrib import admin
 from django.db import models
 from tinymce.widgets import TinyMCE
 
-from .models import (ChoiceOption, ChoiceStep, Lesson, ProgrammingStep, Step,
-                     TestCase, TextInputStep, TheoryStep)
+from .models import (
+    ChoiceOption,
+    ChoiceStep,
+    Lesson,
+    ProgrammingStep,
+    Step,
+    TestCase,
+    TextInputStep,
+    TheoryStep,
+)
 
 
 class StepInline(admin.TabularInline):

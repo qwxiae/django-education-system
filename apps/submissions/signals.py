@@ -10,33 +10,31 @@ from .models import Submission
 @receiver(post_save, sender=Submission)
 def update_enrollment_progress(sender, instance, created, **kwargs):
     if instance.status != Submission.Status.CORRECT:
-        return 
-    
+        return
+
     if instance.step.type not in ["C", "I", "P"]:
-        return 
-    
+        return
+
     try:
         enrollment = Enrollment.objects.get(
-            user=instance.user,
-            course=instance.step.lesson.module.course
+            user=instance.user, course=instance.step.lesson.module.course
         )
     except Enrollment.DoesNotExist:
-        return 
-    
-    previous_correct = Submission.objects.filter(
-        user=instance.user,
-        step=instance.step,
-        status=Submission.Status.CORRECT
-    ).exclude(pk=instance.pk).exists()
+        return
+
+    previous_correct = (
+        Submission.objects.filter(
+            user=instance.user, step=instance.step, status=Submission.Status.CORRECT
+        )
+        .exclude(pk=instance.pk)
+        .exists()
+    )
 
     if not previous_correct:
         from django.db.models import F
 
-        # TODO: why F and why this weird sequence of actions
         enrollment.progress = F("progress") + 1
         enrollment.save()
         enrollment.refresh_from_db()
         enrollment.last_active_at = instance.submitted_at
         enrollment.save()
-
-    

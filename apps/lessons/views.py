@@ -1,9 +1,6 @@
 from django.shortcuts import get_object_or_404, render
 
-from .models import (
-    ChoiceStep, Lesson, ProgrammingStep,
-    Step, TextInputStep, TheoryStep
-)
+from .models import ChoiceStep, Lesson, ProgrammingStep, Step, TextInputStep, TheoryStep
 
 
 def lesson_view(request, lesson_id):
@@ -20,20 +17,26 @@ def lesson_view(request, lesson_id):
     if current_step.type == "T":
         step_content = TheoryStep.objects.get(pk=current_step.pk)
     elif current_step.type == "C":
-        step_content = ChoiceStep.objects.prefetch_related("options").get(pk=current_step.pk)
+        step_content = ChoiceStep.objects.prefetch_related("options").get(
+            pk=current_step.pk
+        )
     elif current_step.type == "I":
         step_content = TextInputStep.objects.get(pk=current_step.pk)
     elif current_step.type == "P":
-        step_content = ProgrammingStep.objects.prefetch_related("test_cases").get(pk=current_step.pk)
+        step_content = ProgrammingStep.objects.prefetch_related("test_cases").get(
+            pk=current_step.pk
+        )
 
-    # TODO: sessions vs query
     completed_steps = request.session.get("completed_steps")
 
-    return render(request, "lessons/lesson.html", {
-        "lesson": lesson,
-        "course": lesson.module.course,
-        "steps": steps,
-        "current_step": step_content,
-        "completed_steps": completed_steps,
-    })
-
+    return render(
+        request,
+        "lessons/lesson.html",
+        {
+            "lesson": lesson,
+            "course": lesson.module.course,
+            "steps": steps,
+            "current_step": step_content,
+            "completed_steps": completed_steps,
+        },
+    )

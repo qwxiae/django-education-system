@@ -11,6 +11,8 @@ User = get_user_model()
 
 
 def register_view(request: HttpRequest) -> HttpResponse:
+    """User register page: redirects to home when reigstered."""
+
     if request.user.is_authenticated:
         return redirect("users:profile")
 
@@ -19,7 +21,7 @@ def register_view(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
-            # Do not save RAW user, it will save password as plaintext
+            # do not save RAW user, it will save password as plaintext
             user = form.save()
 
             login(request, user)
@@ -29,6 +31,8 @@ def register_view(request: HttpRequest) -> HttpResponse:
 
 
 def login_view(request: HttpRequest) -> HttpResponse:
+    """User login page: if user not found redirects to ?next or home page if query parameter does not exist."""
+
     if request.user.is_authenticated:
         return redirect("users:profile")
 
@@ -51,7 +55,7 @@ def login_view(request: HttpRequest) -> HttpResponse:
                 )
                 return redirect(next_url)
             else:
-                # Make sure error is present, so form can show it.
+                # error must be present, so form can show it.
                 form.add_error(None, "Invalid email or password")
 
     return render(
@@ -60,6 +64,8 @@ def login_view(request: HttpRequest) -> HttpResponse:
 
 
 def public_profile_view(request: HttpRequest, username: str) -> HttpResponse:
+    """User's profile page: shows all user's created courses and information provided in profile form."""
+
     user = get_object_or_404(User, username=username)
     taught_courses = Course.objects.filter(
         author=user, is_published=True
@@ -73,11 +79,11 @@ def public_profile_view(request: HttpRequest, username: str) -> HttpResponse:
             "taught_courses": taught_courses,
         },
     )
-    # return render(request, "users/public_profile.html", {"profile_user": user})
-    # user = get_object_or_404(User, pk=user_id)
 
 
 def logout_view(request: HttpRequest) -> HttpResponse:
+    """Logout function: redirects to ?next or home is query parameter not provided."""
+
     if request.user.is_authenticated:
         logout(request)
     next_url = (
@@ -88,13 +94,16 @@ def logout_view(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def profile_view(request: HttpRequest):
+    """Authenticated users profile page: authenticated user's own profile."""
+
     return redirect("users:public_profile", username=request.user.username)
 
 
 @login_required
 def profile_edit_view(request: HttpRequest) -> HttpResponse:
+    """Profile edit page: redirects to authenticated user's profile."""
+
     if request.method == "POST":
-        # we do not want to create a new profile but update => must pass instance
         user_form = UserForm(request.POST, instance=request.user)
         profile_form = ProfileForm(
             request.POST,
@@ -102,6 +111,7 @@ def profile_edit_view(request: HttpRequest) -> HttpResponse:
             request.FILES,
             instance=request.user.profile,
         )
+
         if user_form.is_valid() and profile_form.is_valid():
             profile_form.save()
             user_form.save()

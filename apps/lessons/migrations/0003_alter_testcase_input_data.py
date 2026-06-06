@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('lessons', '0002_alter_choiceoption_options'),
+        ("lessons", "0002_alter_choiceoption_options"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='testcase',
-            name='input_data',
-            field=models.TextField(blank=True, default=''),
+            model_name="testcase",
+            name="input_data",
+            field=models.TextField(blank=True, default=""),
         ),
     ]

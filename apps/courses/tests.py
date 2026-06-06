@@ -17,9 +17,7 @@ class BaseTestClass(TestCase):
         Role.objects.create(name="student")
 
         self.User = get_user_model()
-        # Must use create_user to hash password
-        # login uses hashed passwords if the input it is
-        # treated like a different password
+        # must use create_user to hash password: login uses hashed passwords
         self.author = self.User.objects.create_user(
             username="coursetest",
             email="test_courses@test.com",
@@ -118,9 +116,6 @@ class ModuleTestCase(BaseTestClass):
         response = self.client.get(
             reverse("courses:course_detail", kwargs={"slug": self.course.slug})
         )
-        # two queries would not be equal as the context query is annotated
-        # when we convert to list, we compare objects and queries
-        # queries can be unreliable because of query methods
         self.assertEqual(
             list(response.context["modules"]),
             list(Module.objects.filter(course=self.course)),
@@ -144,7 +139,6 @@ class ModuleTestCase(BaseTestClass):
 class EnrollmentTestCase(BaseTestClass):
     def setUp(self):
         super().setUp()
-        # most enrollment actions require auth - login once for the whole class
         logged_in = self.client.login(
             email="test_student@test.com", password="testingStudent"
         )

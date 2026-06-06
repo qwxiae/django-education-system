@@ -36,8 +36,7 @@ class ChoiceSubmission(models.Model):
         Submission, on_delete=models.CASCADE, related_name="choice_submission"
     )
     selected_options = models.ManyToManyField(
-        "lessons.ChoiceOption",
-        related_name="submissions"
+        "lessons.ChoiceOption", related_name="submissions"
     )
     is_correct = models.BooleanField(default=False)
 

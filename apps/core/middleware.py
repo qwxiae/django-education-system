@@ -14,7 +14,6 @@ class RequestLogMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        # unique id per request (VERY useful for debugging)
         request_id = str(uuid.uuid4())[:8]
         request.request_id = request_id
 

@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.utils.functional import cached_property
 
+
 class UserManager(BaseUserManager):
     """Logging using email."""
 
@@ -22,6 +23,8 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractUser):
+    """User that uses email, username and password."""
+
     # Remove names - they live on Profile
     first_name = None
     last_name = None
@@ -75,6 +78,8 @@ class Profile(models.Model):
 
 
 class Role(models.Model):
+    """User roles: Student, Instructor, Moderator."""
+
     name = models.CharField(max_length=100, unique=True, blank=False)
     description = models.TextField(max_length=500, blank=True, default="")
 
@@ -87,11 +92,10 @@ class Role(models.Model):
 
 class UserRole(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_roles")
-    # PROTECT because otherwise deleting a User will delete a Role
+    # PROTECT otherwise deleting a User will delete a Role
     role = models.ForeignKey(Role, on_delete=models.PROTECT, related_name="user_roles")
 
     class Meta:
         db_table = "users_userrole"
         # prevents duplicate assignments
         unique_together = [("user", "role")]
-

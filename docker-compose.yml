@@ -75,12 +75,13 @@ services:
       timeout: 5s
       retries: 5
 
-  piston:
-    image: ghcr.io/engineer-man/piston:latest
-    privileged: true        # required for isolate sandboxing
-    restart: always
-    volumes:
-      - piston_data:/piston/data
+# === Can swap executor for piston
+  # piston:
+  #   image: ghcr.io/engineer-man/piston:latest
+  #   privileged: true        # required for isolate sandboxing
+  #   restart: always
+  #   volumes:
+  #     - piston_data:/piston/data
 
   nginx:
     image: nginx:alpine

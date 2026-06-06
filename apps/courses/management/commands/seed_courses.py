@@ -62,7 +62,6 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS("Done creating courses."))
 
-
         courses = list(Course.objects.filter(is_published=True))
         users = User.objects.filter(is_staff=False)
 
@@ -75,7 +74,7 @@ class Command(BaseCommand):
                     defaults={
                         "username": f"student{i}",
                         "is_active": True,
-                    }
+                    },
                 )
                 if created:
                     user.set_password("testpass123")
@@ -86,9 +85,7 @@ class Command(BaseCommand):
         for user in users:
             course = random.choice(courses)
             enrollment, created = Enrollment.objects.get_or_create(
-                user=user,
-                course=course,
-                defaults={"progress": random.randint(0, 100)}
+                user=user, course=course, defaults={"progress": random.randint(0, 100)}
             )
             if created:
                 enrollment.progress = random.randint(0, 100)

@@ -6,6 +6,7 @@ from decouple import config
 
 ENVIRONMENT = config("ENVIRONMENT", default="development")
 
+
 def get_secret(name, env_var, default=None, cast=str):
     secret_path = f"/run/secrets/{name}"
     if os.path.exists(secret_path):
@@ -248,9 +249,7 @@ JAZZMIN_UI_TWEAKS = {
 
 # === Celery ===
 CELERY_BROKER_URL = get_secret(
-    "rabbitmq_url",
-    "RABBITMQ_URL",
-    default="amqp://guest:guest@localhost:5672//"
+    "rabbitmq_url", "RABBITMQ_URL", default="amqp://guest:guest@localhost:5672//"
 )
 
 # stores results in postgres
@@ -266,26 +265,22 @@ CELERY_TIMEZONE = "UTC"
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-
     "formatters": {
         "verbose": {
             "format": "[{levelname}] {asctime} {name}: {message}",
             "style": "{",
         },
     },
-
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
             "formatter": "verbose",
         },
     },
-
     "root": {
         "handlers": ["console"],
         "level": "INFO",
     },
-
     "loggers": {
         "django": {
             "handlers": ["console"],
@@ -301,4 +296,6 @@ LOGGING = {
 }
 
 # === CODE EXECUTOR ===
-EXECUTOR_URL = get_secret("executor_url", "EXECUTOR_URL", default="http://executor:8080")
+EXECUTOR_URL = get_secret(
+    "executor_url", "EXECUTOR_URL", default="http://executor:8080"
+)

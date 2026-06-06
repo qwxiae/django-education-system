@@ -4,20 +4,21 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('lessons', '0002_alter_choiceoption_options'),
-        ('submissions', '0001_initial'),
+        ("lessons", "0002_alter_choiceoption_options"),
+        ("submissions", "0001_initial"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='choicesubmission',
-            name='selected_option_ids',
+            model_name="choicesubmission",
+            name="selected_option_ids",
         ),
         migrations.AddField(
-            model_name='choicesubmission',
-            name='selected_options',
-            field=models.ManyToManyField(related_name='submissions', to='lessons.choiceoption'),
+            model_name="choicesubmission",
+            name="selected_options",
+            field=models.ManyToManyField(
+                related_name="submissions", to="lessons.choiceoption"
+            ),
         ),
     ]

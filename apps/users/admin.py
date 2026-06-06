@@ -6,7 +6,6 @@ from .models import Profile, Role, User, UserRole
 
 class UserRoleInline(admin.TabularInline):
     model = UserRole
-    # one empty row for adding a role
     extra = 1
 
 
@@ -61,10 +60,3 @@ class ProfileAdmin(admin.ModelAdmin):
         ("Personal Information", {"fields": ("first_name", "last_name", "phone")}),
     )
     search_fields = ["user", "user__email"]
-
-
-# @admin.register(OAuthConnection)
-# class OAuthConnectionAdmin(admin.ModelAdmin):
-#     list_display = ["user", "provider", "provider_email", "connected_at"]
-#     search_fields = ["user__email", "provider_email"]
-#     list_filter = ["provider"]

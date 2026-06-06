@@ -4,12 +4,8 @@ import requests
 from celery import shared_task
 from django.conf import settings
 
-import requests
-from django.conf import settings
-import logging
-
-
 logger = logging.getLogger()
+
 
 def execute_code(source_code, stdin="", timeout_ms=5000):
     try:
@@ -20,38 +16,39 @@ def execute_code(source_code, stdin="", timeout_ms=5000):
                 "stdin": stdin or "",
                 "timeout_ms": timeout_ms,
             },
-            timeout=15
+            timeout=15,
         )
         response.raise_for_status()
         data = response.json()
         return {
-            "output":     data.get("stdout", ""),
-            "error":      data.get("stderr", ""),
+            "output": data.get("stdout", ""),
+            "error": data.get("stderr", ""),
             "runtime_ms": data.get("runtime_ms", 0),
-            "timed_out":  data.get("timed_out", False),
+            "timed_out": data.get("timed_out", False),
         }
     except requests.RequestException as e:
         return {
-            "output":     "",
-            "error":      f"Execution service unavailable: {str(e)}",
+            "output": "",
+            "error": f"Execution service unavailable: {str(e)}",
             "runtime_ms": 0,
-            "timed_out":  False,
+            "timed_out": False,
         }
 
 
 @shared_task(bind=True, max_retries=3)
 def run_code_submission(self, code_submission_id):
-    from .models import CodeSubmission, TestCaseResult, Submission
     from apps.lessons.models import ProgrammingStep
 
-    try:
-        code_sub = CodeSubmission.objects.select_related(
-            "submission"
-        ).get(pk=code_submission_id)
+    from .models import CodeSubmission, Submission, TestCaseResult
 
-        prog_step = ProgrammingStep.objects.prefetch_related(
-            "test_cases"
-        ).get(pk=code_sub.submission.step_id)
+    try:
+        code_sub = CodeSubmission.objects.select_related("submission").get(
+            pk=code_submission_id
+        )
+
+        prog_step = ProgrammingStep.objects.prefetch_related("test_cases").get(
+            pk=code_sub.submission.step_id
+        )
 
         test_cases = list(prog_step.test_cases.all())
         passed = 0
@@ -63,17 +60,9 @@ def run_code_submission(self, code_submission_id):
                 timeout_ms=prog_step.time_limit_ms,
             )
 
-            actual   = result["output"].strip()
+            actual = result["output"].strip()
             expected = test_case.expected_output.strip()
             is_passed = actual == expected and not result["timed_out"]
-
-            print(f"--- TEST CASE {test_case.order} ---", flush=True)
-            print(f"ACTUAL:   {repr(actual)}", flush=True)
-            print(f"EXPECTED: {repr(expected)}", flush=True)
-            print(f"PASSED:   {is_passed}", flush=True)
-            print(f"ERROR:    {repr(result['error'])}", flush=True)
-            print(f"FULL RESULT: {result}", flush=True)
-            print(f"SOURCE CODE: {repr(code_sub.source_code)}", flush=True)
 
             if is_passed:
                 passed += 1
@@ -82,14 +71,14 @@ def run_code_submission(self, code_submission_id):
                 submission=code_sub,
                 test_case=test_case,
                 defaults={
-                    "passed":        is_passed,
+                    "passed": is_passed,
                     "actual_output": result["output"] or result["error"],
-                    "runtime_ms":    result["runtime_ms"],
-                }
+                    "runtime_ms": result["runtime_ms"],
+                },
             )
 
         code_sub.tests_passed = passed
-        code_sub.tests_total  = len(test_cases)
+        code_sub.tests_total = len(test_cases)
         code_sub.save()
 
         submission = code_sub.submission

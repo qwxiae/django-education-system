@@ -5,7 +5,7 @@ User = get_user_model()
 
 
 class EmailBackend(ModelBackend):
-    """We owerite the default username authentication"""
+    """Email overrides the default username authentication."""
 
     def authenticate(self, request, email=None, password=None, **kwargs):
         """

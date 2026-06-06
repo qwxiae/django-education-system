@@ -15,12 +15,9 @@ class Command(BaseCommand):
         ]
 
         for name, description in categories:
-            # Defaults are necessary otherwise you would match
-            # name and description creating UNIQUE error
             slug = slugify(name)
             name, created = Category.objects.get_or_create(
-                # look up by slug not name
-                # Mathematics and mathematics generate same slug
+                # look up by slug not name: Mathematics and mathematics generate same slug
                 slug=slug,
                 defaults={"name": name, "description": description},
             )

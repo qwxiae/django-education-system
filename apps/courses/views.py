@@ -1,17 +1,19 @@
-from . import services
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect, render
-from django.views.decorators.http import require_POST
 from django.db.models import Count, Q
 from django.http import Http404
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 
+from . import services
 from .models import Category, Course, Enrollment
 
 User = get_user_model()
 
 
 def home_view(request):
+    """Home page: shows featured courses and basic information."""
+
     featured_courses = services.get_featured_courses()
 
     return render(
@@ -23,9 +25,13 @@ def home_view(request):
         },
     )
 
+
 def catalog_view(request):
+    """Catalog page: shows all courses, sorted by categories and queried by title"""
+
     categories = services.get_categories()
 
+    # category is passed in hidden input
     category_slug = request.GET.get("category")
     q = request.GET.get("q")
 
@@ -44,6 +50,8 @@ def catalog_view(request):
 
 
 def course_detail_view(request, slug: str):
+    """Course page: course information, shows all modules, lessons, and allows for enrollment."""
+
     course = services.get_course_detail(slug=slug)
 
     if course is None:
@@ -70,6 +78,8 @@ def course_detail_view(request, slug: str):
 @login_required
 @require_POST
 def enroll_view(request, slug: str):
+    """Enrollment function: creates an Enrollment, updates button without refreshing using HTMX."""
+
     course = get_object_or_404(Course, slug=slug, is_published=True)
     Enrollment.objects.get_or_create(user=request.user, course=course)
 
@@ -86,6 +96,8 @@ def enroll_view(request, slug: str):
 @login_required
 @require_POST
 def unenroll_view(request, slug: str):
+    """Unenrollment function: deletes an Enrollment."""
+
     course = get_object_or_404(Course, slug=slug, is_published=True)
     Enrollment.objects.filter(user=request.user, course=course).delete()
 
@@ -106,19 +118,18 @@ def unenroll_view(request, slug: str):
 
 @login_required
 def my_courses_view(request):
+    """User's enrolled courses view: displays all enrolled courses with progress"""
+
     enrollments = (
-            Enrollment.objects
-            .filter(user=request.user)
-            .select_related("course", "course__category", "course__author")
-            .annotate(
-                total_exercises=Count(
-                    "course__modules__lessons__steps",
-                    filter=Q(course__modules__lessons__steps__type__in=["C", "I", "P"])
-                )
+        Enrollment.objects.filter(user=request.user)
+        .select_related("course", "course__category", "course__author")
+        .annotate(
+            total_exercises=Count(
+                "course__modules__lessons__steps",
+                filter=Q(course__modules__lessons__steps__type__in=["C", "I", "P"]),
             )
-            .order_by("-enrolled_at")
         )
-    
-    
+        .order_by("-enrolled_at")
+    )
 
     return render(request, "courses/my_courses.html", {"enrollments": enrollments})

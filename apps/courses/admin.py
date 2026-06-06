@@ -6,21 +6,14 @@ from .models import Category, Course, Enrollment, Module
 
 
 class ModuleInline(admin.TabularInline):
-    """
-    Modules exist in relation to Courses.
-    No point in making modules outside a Course.
-    """
-
     model = Module
     extra = 1
 
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    """Categories are seeded. Teachers choose from given Category."""
-
     search_fields = ["name"]
-    # Dont add description TextField looks bad in admin
+    # dont add description TextField looks bad in admin
     list_display = ["name", "slug"]
     prepopulated_fields = {"slug": ["name"]}
 

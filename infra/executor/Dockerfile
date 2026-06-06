@@ -4,7 +4,9 @@ RUN useradd -m -u 1000 runner
 
 WORKDIR /app
 
-RUN pip install fastapi uvicorn --no-cache-dir
+COPY requirements.txt .
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY server.py .
 

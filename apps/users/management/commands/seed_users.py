@@ -17,14 +17,12 @@ class Command(BaseCommand):
         ]
 
         for username, email, password, is_instructor in user_data:
-            user, created = User.objects.get_or_create(
-                username=username, email=email
-            )
+            user, created = User.objects.get_or_create(username=username, email=email)
 
             if created:
                 user.set_password(password)
                 user.save()
-                
+
                 if is_instructor:
                     user_role = UserRole.objects.create(user=user, role=instructor_role)
                     user_role.save()

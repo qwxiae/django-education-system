@@ -1,9 +1,15 @@
 from django.core.management import BaseCommand, call_command
 
 from apps.courses.models import Course, Module
-from apps.lessons.models import (ChoiceOption, ChoiceStep, Lesson,
-                                 ProgrammingStep, TestCase, TextInputStep,
-                                 TheoryStep)
+from apps.lessons.models import (
+    ChoiceOption,
+    ChoiceStep,
+    Lesson,
+    ProgrammingStep,
+    TestCase,
+    TextInputStep,
+    TheoryStep,
+)
 
 
 class Command(BaseCommand):
@@ -54,7 +60,7 @@ class Command(BaseCommand):
                         defaults={
                             "title": "Quick Quiz",
                             "question_text": "Pick the correct answer",
-                        }
+                        },
                     )
 
                     for idx, (text, correct) in enumerate(
@@ -72,7 +78,7 @@ class Command(BaseCommand):
                             defaults={
                                 "text": text,
                                 "is_correct": correct,
-                            }
+                            },
                         )
 
                     # === STEP 3: TEXT INPUT ===
@@ -83,8 +89,7 @@ class Command(BaseCommand):
                             "title": "Fill in the blank",
                             "question_text": "2 + 2 = ?",
                             "answer": "4",
-                        }
-                        
+                        },
                     )
 
                     # === STEP 4: PROGRAMMING ===
@@ -92,22 +97,24 @@ class Command(BaseCommand):
                         prog, _ = ProgrammingStep.objects.get_or_create(
                             lesson=lesson,
                             order=4,
-                            defaults = {
+                            defaults={
                                 "title": "Coding Task",
                                 "question_text": "Print: Hello, World!",
                                 "language": ProgrammingStep.ProgLang.PYTHON,
                                 "solution_template": "# Write your code here\n",
-                            }
+                            },
                         )
 
                         TestCase.objects.get_or_create(
                             step=prog,
                             order=1,
-                            defaults={"input_data": "", "expected_output": "Hello, World!"}
+                            defaults={
+                                "input_data": "",
+                                "expected_output": "Hello, World!",
+                            },
                         )
 
         self.stdout.write(self.style.SUCCESS("\nDone seeding ALL lessons"))
-
 
         if created:
             TestCase.objects.get_or_create(

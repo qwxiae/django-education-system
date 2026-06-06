@@ -14,9 +14,4 @@ urlpatterns = [
     # Own Profile
     path("me/", views.profile_view, name="profile"),
     path("me/edit/", views.profile_edit_view, name="profile_edit"),
-    # Password Reset
-    # path("auth/password-reset/", views.password_reset_view, name="password_reset"),
-    # path("auth/password-reset/confirm/", views.password_reset_confirm_view, name="password_reset_confirm"),
-    # OAuth
-    # path("auth/oauth/<str:provider>/", views.oauth_view, name="oauth"),
 ]

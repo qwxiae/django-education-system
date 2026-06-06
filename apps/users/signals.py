@@ -11,6 +11,7 @@ User = get_user_model()
 @receiver(post_delete, sender=Profile, dispatch_uid="delete_profile_avatar")
 def delete_profile_avatar(sender, instance, **kwargs):
     """Delete avatar from file system if avatar exists"""
+
     if instance.avatar:
         instance.avatar.delete(save=False)
 
@@ -18,12 +19,7 @@ def delete_profile_avatar(sender, instance, **kwargs):
 @receiver(post_save, sender=User, dispatch_uid="create_user_profile")
 def create_user_profile(sender, instance, created, **kwargs):
     """Create profile for user"""
-    """
-    # sender    # the model class that was saved → User
-    # instance  # the actual object that was saved → the specific User row
-    # created   # True if this was INSERT, False if this was UPDATE
-    # kwargs    # extra stuff Django passes, you don't need it but must accept it
-    """
+
     # If created for the first time
     if created:
         Profile.objects.create(user=instance)

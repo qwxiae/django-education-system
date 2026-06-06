@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('lessons', '0005_alter_step_order'),
+        ("lessons", "0005_alter_step_order"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='choiceoption',
-            name='order',
+            model_name="choiceoption",
+            name="order",
             field=models.PositiveSmallIntegerField(default=0),
         ),
         migrations.AlterField(
-            model_name='testcase',
-            name='order',
+            model_name="testcase",
+            name="order",
             field=models.PositiveSmallIntegerField(default=0),
         ),
     ]
