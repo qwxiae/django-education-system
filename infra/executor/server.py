@@ -1,79 +1,111 @@
-import subprocess
-import tempfile
-import os
+import asyncio
+import resource
+import shutil
 import time
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from contextlib import asynccontextmanager
+from pathlib import Path
+from uuid import uuid4
 
-app = FastAPI(title="Code Executor")
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
 
-MAX_TIMEOUT = 10
-MAX_OUTPUT  = 10_000
+JOBS_DIR = Path("/tmp/exec_jobs")
+MAX_OUTPUT = 10_000
+SEMAPHORE = asyncio.Semaphore(10)
 
 
 class ExecuteRequest(BaseModel):
-    source_code: str
-    stdin: str = ""
-    timeout_ms: int = 5000
+    source_code: str = Field(..., min_length=1, max_length=50_000)
+    stdin: str = Field(default="", max_length=10_000)
+    timeout_ms: int = Field(default=5_000, ge=100, le=10_000)
 
 
 class ExecuteResponse(BaseModel):
-    stdout:     str
-    stderr:     str
-    exit_code:  int
+    stdout: str
+    stderr: str
+    exit_code: int
+    signal: str | None
     runtime_ms: int
-    timed_out:  bool
+    timed_out: bool
+
+
+def _apply_limits():
+    resource.setrlimit(resource.RLIMIT_CPU, (12, 12))
+    resource.setrlimit(resource.RLIMIT_AS, (256 * 1024 * 1024, 256 * 1024 * 1024))
+    resource.setrlimit(resource.RLIMIT_FSIZE, (16 * 1024 * 1024, 16 * 1024 * 1024))
+    resource.setrlimit(resource.RLIMIT_NOFILE, (64, 64))
+    resource.setrlimit(resource.RLIMIT_NPROC, (32, 32))
+
+
+async def _run(req: ExecuteRequest) -> ExecuteResponse:
+    job_dir = JOBS_DIR / uuid4().hex
+    job_dir.mkdir(parents=True, exist_ok=True)
+    (job_dir / "main.py").write_text(req.source_code, encoding="utf-8")
+
+    try:
+        async with SEMAPHORE:
+            start = time.monotonic()
+            proc = await asyncio.create_subprocess_exec(
+                "python3",
+                str(job_dir / "main.py"),
+                stdin=asyncio.subprocess.PIPE,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                cwd=job_dir,
+                preexec_fn=_apply_limits,
+            )
+            try:
+                out, err = await asyncio.wait_for(
+                    proc.communicate(input=req.stdin.encode()),
+                    timeout=req.timeout_ms / 1000,
+                )
+                return ExecuteResponse(
+                    stdout=out.decode(errors="replace")[:MAX_OUTPUT],
+                    stderr=err.decode(errors="replace")[:MAX_OUTPUT],
+                    exit_code=proc.returncode or 0,
+                    signal=None,
+                    runtime_ms=int((time.monotonic() - start) * 1000),
+                    timed_out=False,
+                )
+            except asyncio.TimeoutError:
+                proc.kill()
+                await proc.wait()
+                return ExecuteResponse(
+                    stdout="",
+                    stderr="Time limit exceeded",
+                    exit_code=124,
+                    signal="SIGKILL",
+                    runtime_ms=req.timeout_ms,
+                    timed_out=True,
+                )
+    finally:
+        shutil.rmtree(job_dir, ignore_errors=True)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    JOBS_DIR.mkdir(parents=True, exist_ok=True)
+    assert shutil.which("python3"), "python3 not found"
+    yield
+    shutil.rmtree(JOBS_DIR, ignore_errors=True)
+
+
+app = FastAPI(title="Code Executor", lifespan=lifespan)
+
+
+@app.exception_handler(Exception)
+async def _err(request: Request, exc: Exception) -> JSONResponse:
+    return JSONResponse(status_code=500, content={"detail": "Internal error"})
 
 
 @app.post("/execute", response_model=ExecuteResponse)
-def execute(req: ExecuteRequest):
-    if not req.source_code:
-        raise HTTPException(status_code=400, detail="No source_code provided")
-
-    timeout_secs = min(req.timeout_ms, MAX_TIMEOUT * 1000) / 1000
-
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".py", delete=False, dir="/tmp"
-    ) as f:
-        f.write(req.source_code)
-        tmp_path = f.name
-
-    try:
-        start = time.monotonic()
-        result = subprocess.run(
-            ["python", tmp_path],
-            input=req.stdin,
-            capture_output=True,
-            text=True,
-            timeout=timeout_secs,
-        )
-        elapsed_ms = int((time.monotonic() - start) * 1000)
-
-        return ExecuteResponse(
-            stdout=result.stdout[:MAX_OUTPUT],
-            stderr=result.stderr[:MAX_OUTPUT],
-            exit_code=result.returncode,
-            runtime_ms=elapsed_ms,
-            timed_out=False,
-        )
-
-    except subprocess.TimeoutExpired:
-        return ExecuteResponse(
-            stdout="",
-            stderr="Time limit exceeded",
-            exit_code=124,
-            runtime_ms=req.timeout_ms,
-            timed_out=True,
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        try:
-            os.unlink(tmp_path)
-        except Exception:
-            pass
+async def execute(req: ExecuteRequest) -> ExecuteResponse:
+    """Run python code"""
+    return await _run(req)
 
 
 @app.get("/health")
-def health():
+def health() -> dict:
+    """Health check"""
     return {"status": "ok"}
