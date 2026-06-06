@@ -1,0 +1,21 @@
+# === DJANGO variables === 
+ENVIRONMENT=production
+DEBUG=True
+SECRET_KEY="your-key"
+ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0,web
+# === POSTGRES settings === 
+POSTGRES_HOST=db
+POSTGRES_DB=dbname
+POSTGRES_USER=dbuser
+POSTGRES_PASSWORD=password
+# === REDIS settings === 
+REDIS_PASSWORD=redispassword
+REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+# === RMQ settings === 
+RABBITMQ_USER=appuser
+RABBITMQ_PASSWORD=strongpassword
+RABBITMQ_URL=amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672//
+# === PISTON settings === 
+PISTON_URL=http://piston:2000
+# === CODE EXECUTOR
+EXECUTOR_URL=http://executor:8080

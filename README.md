@@ -14,7 +14,7 @@
 - Теоретические задания, задания на выбор и ввод правильного ответа, задания по программированию 
 
 **For instructors:**
-- Полное управление своими курсами - создание и обновление курса, уроков, заданий со встроенным редактором текстовых данных TinyMCE 
+- Полное управление своими курсами – создание и обновление курса, уроков, заданий со встроенным редактором текстовых данных TinyMCE 
 - Аналитическая панель для каждого курса: данные о записи, прохождении и самые неудачные задания
 - Учительская панель со всеми курсами пользователя
 
@@ -74,13 +74,13 @@ git clone https://github.com/yourusername/education_system.git
 cd education_system
 
 # 2. environment
-cp .env.example .env
+cp env.example .env
 
 # 3. start
 docker-compose up --build
 
 # 4. seed data (optional)
-docker-compose exec web python manage.py seed_lessons
+docker-compose exec web python manage.py seed_submissions
 
 # 5. create admin user
 docker-compose exec web python manage.py createsuperuser
@@ -122,7 +122,7 @@ EXECUTOR_URL=http://executor:8080
 
 ## Seed Commands
 
-Each command is idempotent — safe to run multiple times.
+Каждая команда идемпотента, может запускаться несколько раз.
 
 ```bash
 python manage.py seed_roles        # student, instructor, moderator roles
