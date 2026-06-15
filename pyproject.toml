@@ -1,11 +1,15 @@
 [tool.ruff]
-ignore = ["E401"]
+extend-exclude = [".venv", "migrations"]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E9", "F63", "F7", "F82", "E501", "F401"]
 
 [tool.mypy]
 python_version = "3.12"
 plugins = ["mypy_django_plugin.main"]
 ignore_missing_imports = true
-
+ 
 [tool.django-stubs]
 django_settings_module = "config.settings"
 

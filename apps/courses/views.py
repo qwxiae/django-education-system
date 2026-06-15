@@ -27,7 +27,8 @@ def home_view(request):
 
 
 def catalog_view(request):
-    """Catalog page: shows all courses, sorted by categories and queried by title"""
+    """Catalog page: shows all courses, sorted by categories and \
+        queried by title"""
 
     categories = services.get_categories()
 
@@ -50,7 +51,8 @@ def catalog_view(request):
 
 
 def course_detail_view(request, slug: str):
-    """Course page: course information, shows all modules, lessons, and allows for enrollment."""
+    """Course page: course information, shows all modules, lessons, \
+        and allows for enrollment."""
 
     course = services.get_course_detail(slug=slug)
 
@@ -78,7 +80,8 @@ def course_detail_view(request, slug: str):
 @login_required
 @require_POST
 def enroll_view(request, slug: str):
-    """Enrollment function: creates an Enrollment, updates button without refreshing using HTMX."""
+    """Enrollment function: creates an Enrollment, updates button \
+        without refreshing using HTMX."""
 
     course = get_object_or_404(Course, slug=slug, is_published=True)
     Enrollment.objects.get_or_create(user=request.user, course=course)
@@ -118,7 +121,8 @@ def unenroll_view(request, slug: str):
 
 @login_required
 def my_courses_view(request):
-    """User's enrolled courses view: displays all enrolled courses with progress"""
+    """User's enrolled courses view: displays all enrolled courses \
+        with progress"""
 
     enrollments = (
         Enrollment.objects.filter(user=request.user)

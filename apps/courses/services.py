@@ -4,7 +4,7 @@ from django.db.models import Count
 from apps.core.cache_keys import CacheKeys
 from apps.core.cache_timeouts import CacheTimeouts
 
-from .models import Category, Course, Enrollment
+from .models import Category, Course
 
 
 def get_categories():

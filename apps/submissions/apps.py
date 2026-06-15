@@ -5,4 +5,4 @@ class SubmissionsConfig(AppConfig):
     name = "apps.submissions"
 
     def ready(self):
-        import apps.submissions.signals
+        import apps.submissions.signals  # noqa: F401

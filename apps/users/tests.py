@@ -146,12 +146,11 @@ class UserRoleTestCase(BaseTestCase):
         self.user_role = UserRole.objects.get(user=self.user, role=self.role)
 
     def test_delete_role_from_userrole(self):
-
         with self.assertRaises(ProtectedError):
             self.role.delete()
 
     def test_delete_user_from_userrole(self):
-        user_id = self.user.id
+        user_id = self.user.id  # pyright: ignore[reportAttributeAccessIssue]
         self.user.delete()
         self.assertFalse(UserRole.objects.filter(user_id=user_id).exists())
 

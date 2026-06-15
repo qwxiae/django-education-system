@@ -2,7 +2,6 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from apps.courses.models import Enrollment
-from apps.lessons.models import Step
 
 from .models import Submission
 
