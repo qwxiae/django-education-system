@@ -1,33 +1,34 @@
 🌍 Languages: [🇬🇧 English](README.md) | [🇷🇺 Русский](README.ru.md)
 
 # EduPlatform
-![Django](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white) [![FastAPI](https://img.shields.io/badge/FastAPI-009485.svg?logo=fastapi&logoColor=white)](#) ![CSS](https://img.shields.io/badge/CSS-1572B6?style=for-the-badge&logo=css3&logoColor=white) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white) ![Celery](https://img.shields.io/badge/Celery-37814A?style=for-the-badge&logo=celery&logoColor=white) ![RabbitMQ](https://img.shields.io/badge/RabbitMQ-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white) ![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white) ![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)
+![Django](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white) [![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](#) ![CSS](https://img.shields.io/badge/CSS-1572B6?style=for-the-badge&logo=css3&logoColor=white) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white) ![Celery](https://img.shields.io/badge/Celery-37814A?style=for-the-badge&logo=celery&logoColor=white) ![RabbitMQ](https://img.shields.io/badge/RabbitMQ-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white) ![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white) ![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)
 
 ## Preview
 ![demo gif](assets/demo.gif)
 ---
-An online educational platform that allows instructors to create courses, lessons, and interactive assignments. Instructors have access to analytics data about course completion. Students can enroll in courses, track their progress, and complete assignments.
+Онлайн образовательная платформа, которая позволяет инструктору создавать курсы, уроки и интерактивные задания. Инструкторам доступны аналитические данные о прохождении их курса. Ученики могут записывться на курсы, отслеживать прогресс и проходить задания.
 
 ## Features
 
-**For students:**:
-- Search and filter the catalog by category and name
-- Enroll in courses and track progress
-- Theoretical tasks, multiple-choice tasks, text input tasks with correct answers, and programming tasks
+**Для студентов:**
+- Поиск и фильтрация каталога по категории и названию
+- Запись на курс и отслеживание прогресса
+- Теоретические задания, задания на выбор и ввод правильного ответа, задания по программированию 
 
-**For instructors:**
-- Full management of courses — creating and updating courses, lessons, and assignments using the built-in TinyMCE rich text editor
-- Analytics dashboard for each course: enrollment data, completion statistics, and most frequently failed tasks
-- Instructor panel with all user-created courses
+**Для инструкторов:**
+- Полное управление своими курсами – создание и обновление курса, уроков, заданий со встроенным редактором текстовых данных TinyMCE 
+- Аналитическая панель для каждого курса: данные о записи, прохождении и самые неудачные задания
+- Учительская панель со всеми курсами пользователя
 
-**System:**
-- Role-based access system (student, instructor)
-- Asynchronous code execution using Celery and an isolated FastAPI microservice
-- Redis caching
-- Django admin customized with Jazzmin
-- Deployment using Docker Compose + Nginx
+**Система:**
+- Ролевая система доступа (student, instructor)
+- Асинхронное выполнение кода вместе с Celery и изолированным FastAPI микросервисом
+- Redis кэширование
+- Django админ стилизирован с помощью Jazzmin
+- Разворотка с помощью Docker Compose + Nginx
 
 ## Tech Stack
+
 | Layer | Technology |
 |---|---|
 | Backend | Django 5, Gunicorn |
@@ -115,9 +116,11 @@ RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672//
 EXECUTOR_URL=http://executor:8080
 ```
 
+
 ## Seed Commands
 
-The commands are idempotent
+Каждая команда идемпотента
+
 ```bash
 python manage.py seed_roles        # student, instructor, moderator roles
 python manage.py seed_categories   # programming, math, science...
@@ -142,9 +145,11 @@ docker-compose exec web coverage run manage.py test
 docker-compose exec web coverage html
 ```
 
+
 ## Known Limitations / Future Work
 
-- [ ] No OAuth (Google/GitHub login)
-- [ ] No email verification or password reset
-- [ ] Code execution sandbox uses subprocess inside Docker
-- [ ] Only Python is supported in programming tasks
+- [ ] Нет OAuth (Google/GitHub login)
+- [ ] Нет подтверждения email или восстановления пароля
+- [ ] Песочница для выполнения кода использует subprocess внутри Docker
+- [ ] В заданиях по программированию поддерживается только Python
+
