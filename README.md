@@ -30,12 +30,12 @@ An online educational platform that allows instructors to create courses, lesson
 ## Tech Stack
 | Layer | Technology |
 |---|---|
-| Backend | Django 5, Gunicorn |
+| Backend | Django, Gunicorn |
 | Frontend | Django Templates, HTMX, Chart.js, CodeMirror 5 |
-| Database | PostgreSQL 14 |
-| Cache | Redis 7 |
+| Database | PostgreSQL |
+| Cache | Redis |
 | Task queue | Celery + RabbitMQ |
-| Code execution | FastAPI microservice (Python 3.11-slim) |
+| Code execution | FastAPI microservice |
 | Web server | Nginx |
 | Admin | Jazzmin + TinyMCE |
 | Containerisation | Docker, Docker Compose |
